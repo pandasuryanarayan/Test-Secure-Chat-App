@@ -1,6 +1,5 @@
 // Define the server URL
-const SERVER_URL = 'http://localhost:3000'; // Your Express server URL
-// const SERVER_URL = 'https://secure-chat-app-8typ.onrender.com';
+const SERVER_URL = 'https://test-secure-chat-app.onrender.com';
 const API_URL = `${SERVER_URL}/api`;
 
 // Initialize Socket.IO with error handling
