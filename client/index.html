@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureChat - End-to-End Encrypted Messaging</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="icon" type="image/webp" href="chat-round-icon.webp">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🔒</span>
+                <span class="logo-text">SecureChat</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg">
+            <div class="hero-bg-gradient"></div>
+            <div class="hero-bg-pattern"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title" data-aos="fade-up" data-aos-duration="1000">
+                <span class="gradient-text">Secure Messaging</span><br>
+                with End-to-End Encryption
+            </h1>
+            <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
+                Connect with anyone using a simple 6-digit ID.<br>
+                Your conversations remain private, always.
+            </p>
+            <div class="hero-buttons" data-aos="fade-up" data-aos-delay="400" data-aos-duration="1000">
+                <a href="/client/login.html" class="btn-large btn-white">Login</a>
+            </div>
+            <div class="hero-stats" data-aos="fade-up" data-aos-delay="600" data-aos-duration="1000">
+                <div class="stat">
+                    <span class="stat-number">256-bit</span>
+                    <span class="stat-label">AES Encryption</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Private</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Data Stored</span>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator" data-aos="fade" data-aos-delay="1000">
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+            <span>Scroll to explore</span>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-label">Features</span>
+                <h2 class="section-title">Why Choose SecureChat?</h2>
+                <p class="section-subtitle">Experience the perfect blend of security and simplicity</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                        </svg>
+                    </div>
+                    <h3>Military-Grade Encryption</h3>
+                    <p>Your messages are protected with AES-256 encryption, the same standard used by governments worldwide.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="11" width="18" height="10" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0110 0v4"/>
+                        </svg>
+                    </div>
+                    <h3>Zero-Knowledge Architecture</h3>
+                    <p>We can't read your messages even if we wanted to. Your privacy is mathematically guaranteed.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+                        </svg>
+                    </div>
+                    <h3>Simple 6-Digit ID</h3>
+                    <p>No phone numbers, no emails. Connect with anyone instantly using a memorable 6-digit code.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <h3>Real-Time Messaging</h3>
+                    <p>Lightning-fast message delivery with read receipts and typing indicators.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                    </div>
+                    <h3>Cross-Platform</h3>
+                    <p>Works seamlessly on any device with a web browser. No downloads required.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="600">
+                    <div class="feature-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 010 7.75"/>
+                        </svg>
+                    </div>
+                    <h3>Group Chats</h3>
+                    <p>Create encrypted group conversations with up to 100 participants.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-label">Process</span>
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">Get started in less than 60 seconds</p>
+            </div>
+            <div class="steps-container">
+                <div class="step" data-aos="fade-right" data-aos-delay="100">
+                    <div class="step-number">01</div>
+                    <div class="step-content">
+                        <h3>Create Account</h3>
+                        <p>Sign up with just an email and password. We'll generate your unique 6-digit ID instantly.</p>
+                    </div>
+                    <div class="step-image">
+                        <div class="mockup-card">
+                            <div class="mockup-input"></div>
+                            <div class="mockup-input"></div>
+                            <div class="mockup-button"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="step reverse" data-aos="fade-left" data-aos-delay="200">
+                    <div class="step-number">02</div>
+                    <div class="step-content">
+                        <h3>Share Your ID</h3>
+                        <p>Share your 6-digit ID with friends. They can find you instantly without revealing personal info.</p>
+                    </div>
+                    <div class="step-image">
+                        <div class="mockup-card">
+                            <div class="mockup-id">123456</div>
+                            <div class="mockup-copy-btn"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="step" data-aos="fade-right" data-aos-delay="300">
+                    <div class="step-number">03</div>
+                    <div class="step-content">
+                        <h3>Start Chatting</h3>
+                        <p>Enter someone's ID to connect. All messages are end-to-end encrypted automatically.</p>
+                    </div>
+                    <div class="step-image">
+                        <div class="mockup-card">
+                            <div class="mockup-chat sent"></div>
+                            <div class="mockup-chat received"></div>
+                            <div class="mockup-chat sent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Section -->
+    <section class="security" id="security">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-label">Security</span>
+                <h2 class="section-title">Bank-Level Security</h2>
+                <p class="section-subtitle">Your privacy is not just a feature, it's our foundation</p>
+            </div>
+            <div class="security-grid">
+                <div class="security-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="security-icon">🔐</div>
+                    <h3>End-to-End Encryption</h3>
+                    <p>Messages are encrypted on your device before being sent and can only be decrypted by the recipient.</p>
+                    <div class="security-features">
+                        <div class="feature-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>AES-256-GCM Encryption</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>RSA-2048 Key Exchange</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Perfect Forward Secrecy</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="security-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="security-icon">🚫</div>
+                    <h3>No Data Collection</h3>
+                    <p>We don't store messages, metadata, or track your activity. What you share stays between you and your recipient.</p>
+                    <div class="security-features">
+                        <div class="feature-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>No Message Storage</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>No Metadata Logging</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>No User Tracking</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="security-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="security-icon">🛡️</div>
+                    <h3>Open Source</h3>
+                    <p>Our code is transparent and auditable by security experts. You can verify our security claims yourself.</p>
+                    <div class="security-features">
+                        <div class="feature-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Publicly Auditable Code</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Community Reviewed</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Regular Security Updates</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" data-aos="zoom-in" data-aos-duration="1000">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Experience True Privacy?</h2>
+                <p>Join thousands who've already made the switch to secure messaging</p>
+                <div class="cta-buttons">
+                    <a href="/client/login.html" class="btn-large btn-white">Login</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-simple">
+                <div class="footer-left">
+                    <span class="logo-icon">🔒</span>
+                    <span>SecureChat - End-to-end encrypted messaging for everyone.</span>
+                </div>
+                <div class="footer-right">
+                    <span>Proudly Made by Surya</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 50
+        });
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            if (currentScroll > lastScroll && currentScroll > 500) {
+                navbar.classList.add('hidden');
+            } else {
+                navbar.classList.remove('hidden');
+            }
+            
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>

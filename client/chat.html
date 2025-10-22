@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- IMPORTANT: Updated viewport meta tag for better keyboard handling -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+    <title>SecureChat - Private Messaging</title>
+    <link rel="stylesheet" href="css/chat-responsive.css">
+</head>
+<body>
+    <div class="chat-wrapper">
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <button class="plus-btn" id="plusBtn" title="Add Contact">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+            <div class="mobile-brand">🔒 SecureChat</div>
+            <div class="mobile-status" id="mobileStatus"></div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="chat-container">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <button class="close-sidebar" id="closeSidebar">&times;</button>
+                    <div class="user-profile">
+                        <h3 id="username"></h3>
+                        <p class="user-id">ID: <span id="userId"></span></p>
+                        <button id="copyIdBtn" class="btn-copy">Copy ID</button>
+                    </div>
+                </div>
+
+                <div class="sidebar-search">
+                    <input type="text" id="searchInput" placeholder="Enter 6-digit ID" maxlength="6">
+                    <button id="searchBtn" class="btn-connect">Connect</button>
+                </div>
+
+                <div class="contacts-wrapper">
+                    <div class="contacts-list" id="contactsList">
+                        <!-- Contacts will be dynamically added here -->
+                    </div>
+                </div>
+
+                <button id="logoutBtn" class="btn-logout">Logout</button>
+            </aside>
+
+            <!-- Chat Area -->
+            <main class="chat-area">
+                <!-- Chat Header -->
+                <header class="chat-header">
+                    <div class="chat-user-info">
+                        <h3 id="chatWith">Select a contact</h3>
+                    </div>
+                    <div class="chat-actions">
+                        <span class="encryption-badge">🔒 Encrypted</span>
+                    </div>
+                </header>
+
+                <!-- Messages Area -->
+                <div class="messages-container" id="messagesContainer">
+                    <div class="welcome-screen">
+                        <div class="welcome-icon">💬</div>
+                        <h2>Welcome to SecureChat</h2>
+                        <p>Select a contact to start messaging</p>
+                        <button class="btn-start" id="startChat">Add Contact</button>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div class="typing-indicator" id="typingIndicator">
+                    <span></span> is typing...
+                </div>
+
+                <!-- Message Input -->
+                <footer class="message-input-area">
+                    <!-- Add this near your message input -->
+                    <div class="message-input-container">
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                        <button id="attachImageBtn" class="attach-btn" title="Send Image">
+                            📎
+                        </button>
+                    </div>
+
+                    <div class="textarea-wrapper">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Type a message... (Shift+Enter for new line)" 
+                            disabled
+                            rows="1"
+                            class="message-textarea"
+                        ></textarea>
+                    </div>
+                    <button id="emojiBtn" class="btn-emoji" disabled title="Emojis">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                            <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                            <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                        </svg>
+                    </button>
+                    <button id="sendBtn" class="btn-send" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+                        </svg>
+                    </button>
+                </footer>
+
+                <!-- Emoji Picker Container -->
+                <div class="emoji-picker-container" id="emojiPickerContainer">
+                    <!-- Emoji picker will be inserted here -->
+                </div>
+            </main>
+        </div>
+
+        <!-- Overlay -->
+        <div class="overlay" id="overlay"></div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="offline-toast" id="offlineToast"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script type="module">
+        import { Picker } from 'https://unpkg.com/emoji-picker-element@^1/index.js';
+        window.EmojiPicker = Picker;
+    </script>
+    <script src="js/encryption.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/textarea-resize.js"></script>
+    <script src="js/emoji-picker-handler.js"></script>
+    <script>
+        // --- MOBILE VIEWPORT & MENU FIX ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to handle the viewport height on mobile
+            const setViewportHeight = () => {
+                // We execute the function once
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            };
+
+            // Run it on load
+            setViewportHeight();
+
+            // Run it on resize and orientation change
+            window.addEventListener('resize', setViewportHeight);
+            window.addEventListener('orientationchange', setViewportHeight);
+
+            // Mobile menu functionality
+            const plusBtn = document.getElementById('plusBtn');
+            const closeSidebar = document.getElementById('closeSidebar');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const startChat = document.getElementById('startChat');
+            const mobileStatus = document.getElementById('mobileStatus');
+
+            // Set mobile status
+            const username = localStorage.getItem('username');
+            if (mobileStatus && username) {
+                mobileStatus.textContent = username;
+            }
+
+            function openMenu() {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => {
+                    document.getElementById('searchInput')?.focus();
+                }, 300);
+            }
+
+            function closeMenu() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            plusBtn?.addEventListener('click', openMenu);
+            closeSidebar?.addEventListener('click', closeMenu);
+            overlay?.addEventListener('click', closeMenu);
+            startChat?.addEventListener('click', openMenu);
+
+            document.getElementById('contactsList')?.addEventListener('click', (e) => {
+                if (e.target.closest('.contact-item') && window.innerWidth <= 768) {
+                    setTimeout(closeMenu, 100);
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    closeMenu();
+                }
+            });
+            }
+        );
+    </script>
+</body>
+</html>
