@@ -59,7 +59,7 @@ async function initEncryption() {
 
 // Check authentication
 if (!localStorage.getItem('token')) {
-    window.location.href = '/client/login.html';
+    window.location.href = '/login.html';
 }
 
 // Display user info
@@ -913,7 +913,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 
     localStorage.clear();
     socket.disconnect();
-    window.location.href = '/client/login.html';
+    window.location.href = '/login.html';
 });
 
 // Show notification
@@ -921,7 +921,7 @@ function showNotification(title, message) {
     if (Notification.permission === 'granted') {
         new Notification(title, {
             body: message,
-            icon: '/client/notification.png'
+            icon: '/notification.png'
         });
     }
 }
