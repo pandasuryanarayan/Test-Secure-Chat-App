@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <!-- IMPORTANT: Updated viewport meta tag for better keyboard handling -->
@@ -7,6 +8,7 @@
     <title>SecureChat - Private Messaging</title>
     <link rel="stylesheet" href="css/chat-responsive.css">
 </head>
+
 <body>
     <div class="chat-wrapper">
         <!-- Mobile Header -->
@@ -79,23 +81,20 @@
                 <footer class="message-input-area">
                     <!-- Add this near your message input -->
                     <div class="message-input-container">
-                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;"
+                            onchange="validateFileSize(this)">
                         <button id="attachImageBtn" class="attach-btn" title="Send Image">
                             📎
                         </button>
                     </div>
 
                     <div class="textarea-wrapper">
-                        <textarea 
-                            id="messageInput" 
-                            placeholder="Type a message... (Shift+Enter for new line)" 
-                            disabled
-                            rows="1"
-                            class="message-textarea"
-                        ></textarea>
+                        <textarea id="messageInput" placeholder="Type a message... (Shift+Enter for new line)" disabled
+                            rows="1" class="message-textarea"></textarea>
                     </div>
                     <button id="emojiBtn" class="btn-emoji" disabled title="Emojis">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
                             <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
                             <line x1="9" y1="9" x2="9.01" y2="9"></line>
@@ -104,7 +103,7 @@
                     </button>
                     <button id="sendBtn" class="btn-send" disabled>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+                            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
                         </svg>
                     </button>
                 </footer>
@@ -135,7 +134,7 @@
     <script src="js/emoji-picker-handler.js"></script>
     <script>
         // --- MOBILE VIEWPORT & MENU FIX ---
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Function to handle the viewport height on mobile
             const setViewportHeight = () => {
                 // We execute the function once
@@ -195,8 +194,21 @@
                     closeMenu();
                 }
             });
-            }
+        }
         );
+        function validateFileSize(input) {
+            const file = input.files[0];
+            if (file) {
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                if (file.size > maxSize) {
+                    alert('Image size should be less than 10MB');
+                    input.value = ''; // Clear the input
+                    return false;
+                }
+            }
+            return true;
+        }
     </script>
 </body>
+
 </html>

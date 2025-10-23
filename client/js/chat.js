@@ -1,9 +1,14 @@
 // Define the server URL
-const SERVER_URL = 'https://test-secure-chat-app.onrender.com';
+const SERVER_URL = 'http://localhost:3000'; // Your Express server URL
+// const SERVER_URL = 'https://secure-chat-app-8typ.onrender.com';
 const API_URL = `${SERVER_URL}/api`;
 
 // Initialize Socket.IO with error handling
 let socket;
+// Add chunking utilities
+const CHUNK_SIZE = 512 * 1024; // 512KB chunks
+// Add handlers for receiving chunked images
+const imageChunks = new Map(); // Store incoming chunks
 
 try {
     // Try to connect to the server
@@ -12,6 +17,9 @@ try {
         reconnection: true,
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
+        maxHttpBufferSize: 1e7, // 10MB in bytes (10 * 1024 * 1024)
+        pingTimeout: 60000,     // Increase timeout for large transfers
+        pingInterval: 25000
     });
     
     // Connection event handlers
@@ -59,7 +67,7 @@ async function initEncryption() {
 
 // Check authentication
 if (!localStorage.getItem('token')) {
-    window.location.href = '/login.html';
+    window.location.href = '/client/login.html';
 }
 
 // Display user info
@@ -696,42 +704,103 @@ document.getElementById('attachImageBtn').addEventListener('click', () => {
     document.getElementById('imageInput').click();
 });
 
-// Handle image selection
+// Add this function to compress images before sending
+async function compressImage(file, maxWidth = 1920, maxHeight = 1080, quality = 0.8) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                
+                // Calculate new dimensions
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = height * (maxWidth / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = width * (maxHeight / height);
+                        height = maxHeight;
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                canvas.toBlob((blob) => {
+                    resolve(new File([blob], file.name, {
+                        type: 'image/jpeg',
+                        lastModified: Date.now()
+                    }));
+                }, 'image/jpeg', quality);
+            };
+        };
+        reader.onerror = reject;
+    });
+}
+
+// Update your image handler to use compression
 document.getElementById('imageInput').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Validate image
     if (!file.type.startsWith('image/')) {
         alert('Please select an image file');
         return;
     }
     
-    // Check file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024;
+    const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
-        alert('Image size should be less than 5MB');
+        alert('Image size should be less than 10MB');
         return;
     }
     
-    await sendImage(file);
+    // Compress if file is larger than 2MB
+    let fileToSend = file;
+    if (file.size > 2 * 1024 * 1024) {
+        showOfflineToast('Compressing image...');
+        try {
+            fileToSend = await compressImage(file);
+            console.log(`Compressed from ${(file.size/1024/1024).toFixed(2)}MB to ${(fileToSend.size/1024/1024).toFixed(2)}MB`);
+        } catch (error) {
+            console.error('Compression failed, sending original:', error);
+        }
+    }
     
-    // Clear the input
+    await sendImage(fileToSend);
     e.target.value = '';
 });
 
-// Send encrypted image
-async function sendImage(file) {
+async function sendImageChunked(file) {
     if (!currentChatUser || !isUserOnline(currentChatUser)) {
         showOfflineToast('User is offline. Cannot send images.');
         return;
     }
     
     try {
+        // Check file size (max 10MB)
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('Image size should be less than 10MB');
+            return;
+        }
+        
+        // Show upload progress
+        showOfflineToast('Uploading image...');
+        
         // Read file as ArrayBuffer
         const arrayBuffer = await file.arrayBuffer();
         
-        // Encrypt the image data
+        // Encrypt the entire file first
         const { encrypted, iv } = await encryption.encryptFile(
             arrayBuffer,
             currentChatUser
@@ -739,7 +808,89 @@ async function sendImage(file) {
         
         const messageId = `${Date.now()}-${Math.random()}`;
         
-        // Prepare image metadata
+        // Convert encrypted data to chunks
+        const encryptedData = encryption.base64ToArrayBuffer(encrypted);
+        const chunks = [];
+        let offset = 0;
+        
+        while (offset < encryptedData.byteLength) {
+            const chunk = encryptedData.slice(offset, offset + CHUNK_SIZE);
+            chunks.push(encryption.arrayBufferToBase64(chunk));
+            offset += CHUNK_SIZE;
+        }
+        
+        // Send metadata first
+        socket.emit('image-start', {
+            targetUserId: currentChatUser,
+            messageId: messageId,
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            totalChunks: chunks.length,
+            iv: iv,
+            senderInfo: {
+                userId: localStorage.getItem('userId'),
+                username: localStorage.getItem('username')
+            }
+        });
+        
+        // Send chunks
+        for (let i = 0; i < chunks.length; i++) {
+            socket.emit('image-chunk', {
+                targetUserId: currentChatUser,
+                messageId: messageId,
+                chunkIndex: i,
+                chunk: chunks[i],
+                isLastChunk: i === chunks.length - 1
+            });
+            
+            // Update progress
+            const progress = Math.round(((i + 1) / chunks.length) * 100);
+            if (progress % 20 === 0) { // Update every 20%
+                showOfflineToast(`Uploading: ${progress}%`);
+            }
+        }
+        
+        // Display in local chat
+        displayImageMessage({
+            encrypted: encrypted,
+            iv: iv,
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            messageId: messageId
+        }, true);
+        
+        showOfflineToast('Image sent successfully!');
+        
+    } catch (error) {
+        console.error('Error sending image:', error);
+        alert('Failed to send image');
+    }
+}
+
+// Replace the old sendImage function call
+async function sendImage(file) {
+    // Use chunked sending for files over 1MB
+    if (file.size > 1024 * 1024) {
+        return sendImageChunked(file);
+    }
+    
+    // Original method for small files (under 1MB)
+    if (!currentChatUser || !isUserOnline(currentChatUser)) {
+        showOfflineToast('User is offline. Cannot send images.');
+        return;
+    }
+    
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const { encrypted, iv } = await encryption.encryptFile(
+            arrayBuffer,
+            currentChatUser
+        );
+        
+        const messageId = `${Date.now()}-${Math.random()}`;
+        
         const imageData = {
             encrypted: encrypted,
             iv: iv,
@@ -749,7 +900,6 @@ async function sendImage(file) {
             messageId: messageId
         };
         
-        // Send via socket
         socket.emit('encrypted-image', {
             targetUserId: currentChatUser,
             imageData: imageData,
@@ -760,7 +910,6 @@ async function sendImage(file) {
             }
         });
         
-        // Display in local chat
         displayImageMessage(imageData, true);
         
     } catch (error) {
@@ -768,6 +917,83 @@ async function sendImage(file) {
         alert('Failed to send image');
     }
 }
+
+socket.on('image-start', (data) => {
+    // Initialize storage for this image's chunks
+    imageChunks.set(data.messageId, {
+        metadata: data,
+        chunks: new Array(data.totalChunks),
+        receivedChunks: 0
+    });
+    
+    // Show receiving progress
+    if (data.fromUserId === currentChatUser) {
+        showOfflineToast(`Receiving image from ${data.senderInfo.username}...`);
+    }
+});
+
+socket.on('image-chunk', async (data) => {
+    const imageData = imageChunks.get(data.messageId);
+    if (!imageData) return;
+    
+    // Store chunk
+    imageData.chunks[data.chunkIndex] = data.chunk;
+    imageData.receivedChunks++;
+    
+    // Update progress
+    const progress = Math.round((imageData.receivedChunks / imageData.metadata.totalChunks) * 100);
+    if (progress % 20 === 0 && data.fromUserId === currentChatUser) {
+        showOfflineToast(`Receiving: ${progress}%`);
+    }
+    
+    // Check if all chunks received
+    if (imageData.receivedChunks === imageData.metadata.totalChunks) {
+        // Reconstruct the encrypted data
+        const encryptedBase64 = imageData.chunks.join('');
+        
+        const completeImageData = {
+            encrypted: encryptedBase64,
+            iv: imageData.metadata.iv,
+            fileName: imageData.metadata.fileName,
+            fileType: imageData.metadata.fileType,
+            fileSize: imageData.metadata.fileSize,
+            messageId: imageData.metadata.messageId
+        };
+        
+        // Process as regular image
+        if (data.fromUserId === currentChatUser) {
+            displayImageMessage(completeImageData, false, imageData.metadata.senderInfo);
+            
+            try {
+                const messageDiv = document.querySelector(`[data-message-id="${imageData.metadata.messageId}"]`);
+                if (messageDiv) {
+                    const img = messageDiv.querySelector('img');
+                    if (img) {
+                        const decryptedBuffer = await encryption.decryptFile(
+                            encryptedBase64,
+                            imageData.metadata.iv,
+                            data.fromUserId
+                        );
+                        
+                        const blob = new Blob([decryptedBuffer], { type: imageData.metadata.fileType });
+                        const url = URL.createObjectURL(blob);
+                        
+                        img.src = url;
+                        img.classList.remove('loading');
+                        img.onclick = () => window.open(url, '_blank');
+                    }
+                }
+                showOfflineToast('Image received successfully!');
+            } catch (error) {
+                console.error('Error decrypting chunked image:', error);
+                showOfflineToast('Error processing received image');
+            }
+        }
+        
+        // Clean up
+        imageChunks.delete(data.messageId);
+    }
+});
 
 // Display image message in chat
 function displayImageMessage(imageData, isSent = false, senderInfo = null) {
@@ -913,7 +1139,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 
     localStorage.clear();
     socket.disconnect();
-    window.location.href = '/login.html';
+    window.location.href = '/client/login.html';
 });
 
 // Show notification
@@ -921,7 +1147,7 @@ function showNotification(title, message) {
     if (Notification.permission === 'granted') {
         new Notification(title, {
             body: message,
-            icon: '/notification.png'
+            icon: '/client/notification.png'
         });
     }
 }

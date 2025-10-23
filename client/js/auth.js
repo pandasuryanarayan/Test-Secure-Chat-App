@@ -1,4 +1,5 @@
-const API_URL = 'https://test-secure-chat-app.onrender.com/api';
+const API_URL = 'http://localhost:3000/api';
+// const API_URL = 'https://secure-chat-app-8typ.onrender.com/api';
 
 function showTab(tab) {
     const loginForm = document.getElementById('loginForm');
@@ -51,7 +52,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             localStorage.setItem('username', data.username);
             showMessage('Login successful! Redirecting...', 'success');
             setTimeout(() => {
-                window.location.href = '/chat.html';
+                window.location.href = '/client/chat.html';
             }, 1500);
         } else {
             showMessage(data.message, 'error');
@@ -98,5 +99,5 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 
 // Check if already logged in
 if (localStorage.getItem('token')) {
-    window.location.href = '/chat.html';
+    window.location.href = '/client/chat.html';
 }
