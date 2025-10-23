@@ -135,8 +135,6 @@ class E2EEncryption {
         return decoder.decode(decryptedData);
     }
 
-    // Add these methods to your E2EEncryption class
-
     // Encrypt file/image with AES
     async encryptFile(fileBuffer, userId) {
         const aesKey = this.sharedSecrets.get(userId);
