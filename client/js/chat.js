@@ -1,6 +1,6 @@
 // Define the server URL
-const SERVER_URL = 'http://localhost:3000'; // Your Express server URL
-// const SERVER_URL = 'https://secure-chat-app-8typ.onrender.com';
+// const SERVER_URL = 'http://localhost:3000'; // Your Express server URL
+const SERVER_URL = 'https://secure-chat-app-8typ.onrender.com';
 const API_URL = `${SERVER_URL}/api`;
 
 // Initialize Socket.IO with error handling
@@ -67,7 +67,7 @@ async function initEncryption() {
 
 // Check authentication
 if (!localStorage.getItem('token')) {
-    window.location.href = '/client/login.html';
+    window.location.href = '/login.html';
 }
 
 // Display user info
@@ -1139,7 +1139,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 
     localStorage.clear();
     socket.disconnect();
-    window.location.href = '/client/login.html';
+    window.location.href = '/login.html';
 });
 
 // Show notification
@@ -1147,7 +1147,7 @@ function showNotification(title, message) {
     if (Notification.permission === 'granted') {
         new Notification(title, {
             body: message,
-            icon: '/client/notification.png'
+            icon: '/notification.png'
         });
     }
 }
