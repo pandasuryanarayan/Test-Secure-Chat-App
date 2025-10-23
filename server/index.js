@@ -13,7 +13,10 @@ const io = socketIO(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
-  }
+  },
+  maxHttpBufferSize: 1e7, // 10MB
+  pingTimeout: 60000,
+  pingInterval: 25000,
 });
 
 // In-memory message buffer (only while users are online)
@@ -389,9 +392,6 @@ socket.on('encrypted-message', (data) => {
     if (user) {
       userSockets.delete(user.userId);
       activeUsers.delete(socket.id);
-      
-      // Clear message buffer for offline user (optional)
-      // messageBuffer.delete(user.userId); // Uncomment if you want to clear on disconnect
       
       // Update user offline status in database
       try {
