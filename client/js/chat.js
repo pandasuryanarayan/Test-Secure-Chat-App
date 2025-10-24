@@ -1,31 +1,27 @@
 // Define the server URL
-// const SERVER_URL = 'http://localhost:3000'; // Your Express server URL
+// const SERVER_URL = 'http://localhost:3000';
 const SERVER_URL = 'https://secure-chat-app-8typ.onrender.com';
 const API_URL = `${SERVER_URL}/api`;
+const IS_PRODUCTION = SERVER_URL.includes('onrender.com') || !SERVER_URL.includes('localhost');
 
-// Initialize Socket.IO with error handling
+// Initialize Socket.IO with production-ready config
 let socket;
-// Add chunking utilities
-const CHUNK_SIZE = 512 * 1024; // 512KB chunks
-// Add handlers for receiving chunked images
-const imageChunks = new Map(); // Store incoming chunks
 
 try {
-    // Try to connect to the server
     socket = io(SERVER_URL, {
-        transports: ['websocket', 'polling'],
+        transports: IS_PRODUCTION ? ['polling', 'websocket'] : ['websocket', 'polling'],
         reconnection: true,
-        reconnectionAttempts: 5,
+        reconnectionAttempts: 10,
         reconnectionDelay: 1000,
-        maxHttpBufferSize: 1e7, // 10MB in bytes (10 * 1024 * 1024)
-        pingTimeout: 60000,     // Increase timeout for large transfers
-        pingInterval: 25000
+        maxHttpBufferSize: 1e6, // 1MB for socket messages only
+        pingTimeout: 60000,
+        pingInterval: 25000,
+        upgrade: true,
+        rememberUpgrade: true
     });
     
-    // Connection event handlers
     socket.on('connect', () => {
-        console.log('Connected to server');
-        // Re-join room if reconnecting
+        console.log('Connected to server via:', socket.io.engine.transport.name);
         if (localStorage.getItem('userId')) {
             socket.emit('join', {
                 userId: localStorage.getItem('userId'),
@@ -36,20 +32,18 @@ try {
     
     socket.on('connect_error', (error) => {
         console.error('Connection error:', error.message);
-        alert('Unable to connect to server. Please make sure the server is running.');
     });
     
     socket.on('disconnect', (reason) => {
         console.log('Disconnected:', reason);
         if (reason === 'io server disconnect') {
-            // Server disconnected, try to reconnect
             socket.connect();
         }
     });
     
 } catch (error) {
     console.error('Failed to initialize Socket.IO:', error);
-    alert('Failed to initialize chat connection. Please check if Socket.IO library is loaded.');
+    alert('Failed to initialize chat connection.');
 }
 
 const encryption = new E2EEncryption();
@@ -57,8 +51,13 @@ let currentChatUser = null;
 let contacts = new Map();
 let typingTimeout;
 let onlineUsers = new Set();
-let messageBuffer = new Map(); // Local buffer for messages
-let processedMessages = new Set(); // Track processed message IDs to prevent duplicates
+let messageBuffer = new Map();
+let processedMessages = new Set();
+
+// Image handling utilities
+const imageChunks = new Map();
+const CHUNK_SIZE = 256 * 1024; // 256KB chunks for production
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB max
 
 // Initialize encryption
 async function initEncryption() {
@@ -73,11 +72,9 @@ if (!localStorage.getItem('token')) {
 // Display user info
 document.getElementById('username').textContent = localStorage.getItem('username');
 document.getElementById('userId').textContent = localStorage.getItem('userId');
-
-// Initialize default chat header
 document.getElementById('chatWith').textContent = '';
 
-// Show offline toast notification
+// Show toast notification
 function showOfflineToast(message) {
     const toast = document.getElementById('offlineToast');
     toast.textContent = message;
@@ -106,7 +103,6 @@ function updateContactsEmptyState() {
             </div>
         `;
     } else {
-        // Remove empty state if it exists
         const emptyState = contactsList.querySelector('.empty-state');
         if (emptyState) {
             emptyState.remove();
@@ -119,16 +115,13 @@ function generateMessageId(message, timestamp, userId) {
     return `${userId}-${timestamp}-${message.substring(0, 10)}`;
 }
 
-// Store message in local buffer (without duplicates)
+// Store message in local buffer
 function storeMessageInBuffer(userId, message, type, timestamp = new Date(), messageId = null) {
     if (!messageBuffer.has(userId)) {
         messageBuffer.set(userId, []);
     }
     
-    // Generate or use provided message ID
     const id = messageId || generateMessageId(message, timestamp.getTime(), userId);
-    
-    // Check if message already exists
     const existingMessages = messageBuffer.get(userId);
     const exists = existingMessages.some(msg => msg.id === id);
     
@@ -148,7 +141,7 @@ function getBufferedMessages(userId) {
     return messageBuffer.get(userId) || [];
 }
 
-// Update send button and input based on user status
+// Update message controls based on user status
 function updateMessageControls() {
     const messageInput = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendBtn');
@@ -175,14 +168,6 @@ function updateMessageControls() {
         sendBtn.style.opacity = '1';
     }
 }
-
-// Socket connection
-socket.on('connect', () => {
-    socket.emit('join', {
-        userId: localStorage.getItem('userId'),
-        username: localStorage.getItem('username')
-    });
-});
 
 // Copy ID button
 document.getElementById('copyIdBtn').addEventListener('click', () => {
@@ -217,21 +202,15 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
         
         if (response.ok) {
             const user = await response.json();
-            
-            // Add to contacts
             contacts.set(user.userId, user);
 
-            // Mark as online if they are
             if (user.isOnline) {
                 onlineUsers.add(user.userId);
             }
 
-            // Update empty state
             updateContactsEmptyState();
-            
             displayContact(user);
 
-            // Notify the other user that they've been added
             socket.emit('contact-added', {
                 targetUserId: user.userId,
                 addedBy: {
@@ -240,7 +219,6 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
                 }
             });
 
-            // Initiate key exchange
             await initiateKeyExchange(user.userId);
             
             document.getElementById('searchInput').value = '';
@@ -258,9 +236,7 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
 socket.on('contact-added', async (data) => {
     const { addedBy } = data;
     
-    // Check if contact already exists
     if (!contacts.has(addedBy.userId)) {
-        // Fetch user details
         try {
             const response = await fetch(`${API_URL}/user/${addedBy.userId}`, {
                 headers: {
@@ -271,16 +247,9 @@ socket.on('contact-added', async (data) => {
             if (response.ok) {
                 const user = await response.json();
                 contacts.set(user.userId, user);
-                
-                // Mark as online
                 onlineUsers.add(user.userId);
-
-                // Update empty state
                 updateContactsEmptyState();
-                
                 displayContact(user);
-                
-                // Show notification
                 showNotification(user.username, `${user.username} added you as a contact`);
             }
         } catch (error) {
@@ -292,14 +261,11 @@ socket.on('contact-added', async (data) => {
 // Display contact in sidebar
 function displayContact(user) {
     const contactsList = document.getElementById('contactsList');
-
-    // Remove empty state if exists
     const emptyState = contactsList.querySelector('.empty-state');
     if (emptyState) {
         emptyState.remove();
     }
     
-    // Check if contact already exists
     let contactDiv = document.getElementById(`contact-${user.userId}`);
     
     if (!contactDiv) {
@@ -309,7 +275,6 @@ function displayContact(user) {
         contactsList.appendChild(contactDiv);
     }
 
-    // Update contact HTML
     const isOnline = onlineUsers.has(user.userId);
     contactDiv.innerHTML = `
         <div class="contact-info">
@@ -328,13 +293,11 @@ function displayContact(user) {
 function selectContact(user) {
     currentChatUser = user.userId;
     
-    // Update UI
     document.querySelectorAll('.contact-item').forEach(item => {
         item.classList.remove('active');
     });
     document.getElementById(`contact-${user.userId}`).classList.add('active');
 
-    // Update chat header with online status
     const isOnline = onlineUsers.has(user.userId);
     document.getElementById('chatWith').innerHTML = `
         ${user.username} 
@@ -343,22 +306,16 @@ function selectContact(user) {
         </span>
     `;
 
-    // Update message controls based on online status
     updateMessageControls();
-    
-    // Clear messages
     document.getElementById('messagesContainer').innerHTML = '';
 
-    // Remove unread indicator
     const contactDiv = document.getElementById(`contact-${user.userId}`);
     if (contactDiv) {
         contactDiv.classList.remove('has-unread');
     }
 
-    // Clear processed messages for this chat to allow fresh display
     processedMessages.clear();
     
-    // Load buffered messages
     const bufferedMessages = getBufferedMessages(user.userId);
     if (bufferedMessages.length > 0) {
         bufferedMessages.forEach(msg => {
@@ -368,7 +325,6 @@ function selectContact(user) {
             }
         });
     } else {
-        // Show start conversation message
         document.getElementById('messagesContainer').innerHTML = `
             <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
                 <p>Start a conversation with ${user.username}</p>
@@ -383,30 +339,24 @@ socket.on('pending-messages', async (data) => {
     
     for (const msgData of messages) {
         try {
-            // Generate unique ID for this message
             const messageId = `${msgData.id || Date.now()}-${fromUserId}`;
             
-            // Skip if already processed
             if (processedMessages.has(messageId)) {
                 continue;
             }
             
-            // Decrypt message
             const decryptedMessage = await encryption.decryptMessage(
                 msgData.encryptedMessage,
                 msgData.iv,
                 fromUserId
             );
             
-            // Store in buffer with unique ID
             storeMessageInBuffer(fromUserId, decryptedMessage, 'received', new Date(msgData.timestamp), messageId);
             
-            // Display if this is the current chat
             if (currentChatUser === fromUserId) {
                 processedMessages.add(messageId);
                 displayMessage(decryptedMessage, 'received', fromUserId, new Date(msgData.timestamp));
             } else {
-                // Add unread indicator
                 const contactDiv = document.getElementById(`contact-${fromUserId}`);
                 if (contactDiv && !contactDiv.classList.contains('has-unread')) {
                     contactDiv.classList.add('has-unread');
@@ -423,13 +373,11 @@ socket.on('user-online', (data) => {
     const { userId, username } = data;
     onlineUsers.add(userId);
     
-    // Update contact if exists
     if (contacts.has(userId)) {
         const user = contacts.get(userId);
         user.isOnline = true;
         displayContact(user);
         
-        // Update chat header if this is current chat
         if (currentChatUser === userId) {
             document.getElementById('chatWith').innerHTML = `
                 ${username} 
@@ -445,13 +393,11 @@ socket.on('user-offline', (data) => {
     const { userId } = data;
     onlineUsers.delete(userId);
     
-    // Update contact if exists
     if (contacts.has(userId)) {
         const user = contacts.get(userId);
         user.isOnline = false;
         displayContact(user);
         
-        // Update chat header if this is current chat
         if (currentChatUser === userId) {
             document.getElementById('chatWith').innerHTML = `
                 ${user.username} 
@@ -467,37 +413,30 @@ async function initiateKeyExchange(targetUserId) {
     const publicKey = await encryption.exportPublicKey();
     const aesKey = await encryption.generateAESKey();
     
-    // Send public key to target user
     socket.emit('key-exchange', {
         targetUserId,
         publicKey,
         type: 'public-key'
     });
     
-    // Store AES key temporarily
     encryption.tempAESKey = aesKey;
 }
 
 // Handle key exchange
 socket.on('key-exchange', async (data) => {
     if (data.type === 'public-key') {
-        // Import sender's public key
         const publicKey = await encryption.importPublicKey(data.publicKey);
-        
-        // Generate and encrypt AES key
         const aesKey = await encryption.generateAESKey();
         encryption.setSharedSecret(data.fromUserId, aesKey);
         
         const encryptedAESKey = await encryption.encryptAESKey(aesKey, publicKey);
         
-        // Send encrypted AES key back
         socket.emit('key-exchange', {
             targetUserId: data.fromUserId,
             publicKey: encryptedAESKey,
             type: 'aes-key'
         });
     } else if (data.type === 'aes-key') {
-        // Decrypt AES key
         const aesKey = await encryption.decryptAESKey(data.publicKey);
         encryption.setSharedSecret(data.fromUserId, aesKey);
     }
@@ -505,12 +444,7 @@ socket.on('key-exchange', async (data) => {
 
 // Send message
 document.getElementById('sendBtn').addEventListener('click', sendMessage);
-// The keydown event is now properly handled in textarea-resize.js
-
-// Add input event for typing indicator
-document.getElementById('messageInput').addEventListener('input', function() {
-    handleTyping();
-});
+document.getElementById('messageInput').addEventListener('input', handleTyping);
 
 async function sendMessage() {
     const messageInput = document.getElementById('messageInput');
@@ -518,7 +452,6 @@ async function sendMessage() {
     
     if (!message || !currentChatUser) return;
     
-    // Check if user is online
     if (!isUserOnline(currentChatUser)) {
         const user = contacts.get(currentChatUser);
         showOfflineToast(`${user?.username || 'User'} is offline. Message cannot be sent.`);
@@ -526,13 +459,10 @@ async function sendMessage() {
     }
     
     try {
-        // Encrypt message
         const { encrypted, iv } = await encryption.encryptMessage(message, currentChatUser);
-        
         const timestamp = new Date();
         const messageId = generateMessageId(message, timestamp.getTime(), localStorage.getItem('userId'));
         
-        // Send encrypted message with sender info
         socket.emit('encrypted-message', {
             targetUserId: currentChatUser,
             encryptedMessage: encrypted,
@@ -544,18 +474,13 @@ async function sendMessage() {
             }
         });
         
-        // Store in local buffer
         storeMessageInBuffer(currentChatUser, message, 'sent', timestamp, messageId);
         processedMessages.add(messageId);
-        
-        // Display message in UI
         displayMessage(message, 'sent');
         
-        // Clear and reset textarea using the exported function
         if (window.resetTextareaHeight) {
             window.resetTextareaHeight();
         } else {
-            // Fallback if function not available
             messageInput.value = '';
             messageInput.style.height = 'auto';
         }
@@ -568,17 +493,13 @@ async function sendMessage() {
 // Receive message
 socket.on('receive-message', async (data) => {
     try {
-        // Generate or use message ID
         const messageId = data.messageId || `${data.fromUserId}-${new Date(data.timestamp).getTime()}`;
         
-        // Skip if already processed
         if (processedMessages.has(messageId)) {
             return;
         }
         
-        // Check if sender is in contacts, if not add them
         if (!contacts.has(data.fromUserId)) {
-            // Fetch sender details
             const response = await fetch(`${API_URL}/user/${data.fromUserId}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -588,39 +509,27 @@ socket.on('receive-message', async (data) => {
             if (response.ok) {
                 const user = await response.json();
                 contacts.set(user.userId, user);
-                
-                // Mark as online since they're sending messages
                 onlineUsers.add(user.userId);
-                
-                // Update empty state
                 updateContactsEmptyState();
-                
                 displayContact(user);
             }
         }
         
-        // Decrypt message
         const decryptedMessage = await encryption.decryptMessage(
             data.encryptedMessage,
             data.iv,
             data.fromUserId
         );
         
-        // Mark as processed
         processedMessages.add(messageId);
-        
-        // Store in buffer
         storeMessageInBuffer(data.fromUserId, decryptedMessage, 'received', new Date(data.timestamp), messageId);
         
-        // Display message only if it's from current chat
         if (currentChatUser === data.fromUserId) {
             displayMessage(decryptedMessage, 'received', data.fromUserId, new Date(data.timestamp));
         } else {
-            // Show notification for message from other user
             const sender = contacts.get(data.fromUserId);
             showNotification(sender?.username || 'New Message', decryptedMessage);
             
-            // Add unread indicator to contact
             const contactDiv = document.getElementById(`contact-${data.fromUserId}`);
             if (contactDiv && !contactDiv.classList.contains('has-unread')) {
                 contactDiv.classList.add('has-unread');
@@ -636,7 +545,6 @@ socket.on('receive-message', async (data) => {
 function displayMessage(message, type, fromUserId = null, timestamp = new Date()) {
     const messagesContainer = document.getElementById('messagesContainer');
     
-    // Remove empty state or no-chat-selected if exists
     const emptyMessage = messagesContainer.querySelector('div[style*="text-align: center"]');
     const noChatSelected = messagesContainer.querySelector('.no-chat-selected');
     if (emptyMessage) emptyMessage.remove();
@@ -647,7 +555,6 @@ function displayMessage(message, type, fromUserId = null, timestamp = new Date()
     
     const time = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
-    // Add sender name for received messages
     let senderName = '';
     if (type === 'received' && fromUserId) {
         const sender = contacts.get(fromUserId);
@@ -695,287 +602,236 @@ socket.on('user-typing', (data) => {
     }
 });
 
-// Image attachment button
-document.getElementById('attachImageBtn').addEventListener('click', () => {
-    if (!currentChatUser) {
-        alert('Please select a contact first');
-        return;
-    }
-    document.getElementById('imageInput').click();
-});
+// ====================
+// IMAGE HANDLING - INDUSTRIAL LEVEL
+// ====================
 
-// Add this function to compress images before sending
-async function compressImage(file, maxWidth = 1920, maxHeight = 1080, quality = 0.8) {
-    return new Promise((resolve, reject) => {
+// Compress image with quality adjustment
+async function compressImage(file, maxWidth = 1920, maxHeight = 1080, targetSizeMB = 1) {
+    return new Promise((resolve) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = (e) => {
             const img = new Image();
             img.src = e.target.result;
             img.onload = () => {
-                const canvas = document.createElement('canvas');
+                let quality = 0.9;
                 let width = img.width;
                 let height = img.height;
                 
                 // Calculate new dimensions
                 if (width > height) {
                     if (width > maxWidth) {
-                        height = height * (maxWidth / width);
+                        height = Math.round(height * (maxWidth / width));
                         width = maxWidth;
                     }
                 } else {
                     if (height > maxHeight) {
-                        width = width * (maxHeight / height);
+                        width = Math.round(width * (maxHeight / height));
                         height = maxHeight;
                     }
                 }
                 
+                const canvas = document.createElement('canvas');
                 canvas.width = width;
                 canvas.height = height;
-                
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
                 
-                canvas.toBlob((blob) => {
+                const tryCompress = (q) => {
+                    return new Promise((resolveBlob) => {
+                        canvas.toBlob((blob) => {
+                            resolveBlob(blob);
+                        }, 'image/jpeg', q);
+                    });
+                };
+                
+                const compress = async () => {
+                    let blob = await tryCompress(quality);
+                    const targetSize = targetSizeMB * 1024 * 1024;
+                    
+                    while (blob.size > targetSize && quality > 0.1) {
+                        quality -= 0.1;
+                        blob = await tryCompress(quality);
+                    }
+                    
+                    console.log(`Compressed: ${(file.size/1024/1024).toFixed(2)}MB -> ${(blob.size/1024/1024).toFixed(2)}MB`);
+                    
                     resolve(new File([blob], file.name, {
                         type: 'image/jpeg',
                         lastModified: Date.now()
                     }));
-                }, 'image/jpeg', quality);
+                };
+                
+                compress();
             };
+            img.onerror = () => resolve(file);
         };
-        reader.onerror = reject;
+        reader.onerror = () => resolve(file);
     });
 }
 
-// Update your image handler to use compression
-document.getElementById('imageInput').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
-        return;
-    }
-    
-    const maxSize = 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-        alert('Image size should be less than 10MB');
-        return;
-    }
-    
-    // Compress if file is larger than 2MB
-    let fileToSend = file;
-    if (file.size > 2 * 1024 * 1024) {
-        showOfflineToast('Compressing image...');
-        try {
-            fileToSend = await compressImage(file);
-            console.log(`Compressed from ${(file.size/1024/1024).toFixed(2)}MB to ${(fileToSend.size/1024/1024).toFixed(2)}MB`);
-        } catch (error) {
-            console.error('Compression failed, sending original:', error);
-        }
-    }
-    
-    await sendImage(fileToSend);
-    e.target.value = '';
-});
-
-async function sendImageChunked(file) {
-    if (!currentChatUser || !isUserOnline(currentChatUser)) {
-        showOfflineToast('User is offline. Cannot send images.');
-        return;
-    }
-    
+// Upload image via HTTP (production-ready)
+async function uploadImageViaHTTP(file, targetUserId) {
     try {
-        // Check file size (max 10MB)
-        const maxSize = 10 * 1024 * 1024;
-        if (file.size > maxSize) {
-            alert('Image size should be less than 10MB');
-            return;
+        showOfflineToast('Processing image...');
+        
+        // Compress if large
+        let fileToUpload = file;
+        if (file.size > 1 * 1024 * 1024) {
+            showOfflineToast('Compressing image...');
+            fileToUpload = await compressImage(file, 1920, 1080, 0.8);
         }
         
-        // Show upload progress
-        showOfflineToast('Uploading image...');
+        showOfflineToast('Encrypting image...');
         
-        // Read file as ArrayBuffer
-        const arrayBuffer = await file.arrayBuffer();
+        const arrayBuffer = await fileToUpload.arrayBuffer();
+        const { encrypted, iv } = await encryption.encryptFile(arrayBuffer, targetUserId);
         
-        // Encrypt the entire file first
-        const { encrypted, iv } = await encryption.encryptFile(
-            arrayBuffer,
-            currentChatUser
-        );
+        const messageId = `img-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         
-        const messageId = `${Date.now()}-${Math.random()}`;
-        
-        // Convert encrypted data to chunks
-        const encryptedData = encryption.base64ToArrayBuffer(encrypted);
+        // Split into chunks if needed
         const chunks = [];
-        let offset = 0;
+        const chunkSize = 500 * 1024; // 500KB chunks
         
-        while (offset < encryptedData.byteLength) {
-            const chunk = encryptedData.slice(offset, offset + CHUNK_SIZE);
-            chunks.push(encryption.arrayBufferToBase64(chunk));
-            offset += CHUNK_SIZE;
+        for (let i = 0; i < encrypted.length; i += chunkSize) {
+            chunks.push(encrypted.slice(i, i + chunkSize));
         }
         
-        // Send metadata first
-        socket.emit('image-start', {
-            targetUserId: currentChatUser,
-            messageId: messageId,
-            fileName: file.name,
-            fileType: file.type,
-            fileSize: file.size,
-            totalChunks: chunks.length,
-            iv: iv,
+        if (chunks.length > 1) {
+            // Upload in chunks
+            showOfflineToast(`Uploading in ${chunks.length} parts...`);
+            
+            // Send metadata
+            const metadataResponse = await fetch(`${API_URL}/image/metadata`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    messageId,
+                    targetUserId,
+                    fileName: fileToUpload.name,
+                    fileType: fileToUpload.type,
+                    fileSize: fileToUpload.size,
+                    originalSize: file.size,
+                    totalChunks: chunks.length,
+                    iv
+                })
+            });
+            
+            if (!metadataResponse.ok) {
+                throw new Error('Failed to send metadata');
+            }
+            
+            // Upload chunks
+            for (let i = 0; i < chunks.length; i++) {
+                const chunkResponse = await fetch(`${API_URL}/image/chunk`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        messageId,
+                        chunkIndex: i,
+                        chunkData: chunks[i],
+                        isLastChunk: i === chunks.length - 1
+                    })
+                });
+                
+                if (!chunkResponse.ok) {
+                    throw new Error(`Failed to upload chunk ${i + 1}`);
+                }
+                
+                const progress = Math.round(((i + 1) / chunks.length) * 100);
+                if (progress % 25 === 0) {
+                    showOfflineToast(`Uploading: ${progress}%`);
+                }
+            }
+        } else {
+            // Single upload for small images
+            showOfflineToast('Uploading image...');
+            
+            const response = await fetch(`${API_URL}/image/upload`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    messageId,
+                    targetUserId,
+                    encryptedData: encrypted,
+                    iv,
+                    fileName: fileToUpload.name,
+                    fileType: fileToUpload.type,
+                    fileSize: fileToUpload.size,
+                    originalSize: file.size
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Upload failed');
+            }
+        }
+        
+        // Display locally
+        displayImageMessage({
+            messageId,
+            encrypted,
+            iv,
+            fileName: fileToUpload.name,
+            fileType: fileToUpload.type,
+            fileSize: fileToUpload.size
+        }, true);
+        
+        // Notify via socket
+        socket.emit('image-notification', {
+            targetUserId,
+            messageId,
             senderInfo: {
                 userId: localStorage.getItem('userId'),
                 username: localStorage.getItem('username')
             }
         });
-        
-        // Send chunks
-        for (let i = 0; i < chunks.length; i++) {
-            socket.emit('image-chunk', {
-                targetUserId: currentChatUser,
-                messageId: messageId,
-                chunkIndex: i,
-                chunk: chunks[i],
-                isLastChunk: i === chunks.length - 1
-            });
-            
-            // Update progress
-            const progress = Math.round(((i + 1) / chunks.length) * 100);
-            if (progress % 20 === 0) { // Update every 20%
-                showOfflineToast(`Uploading: ${progress}%`);
-            }
-        }
-        
-        // Display in local chat
-        displayImageMessage({
-            encrypted: encrypted,
-            iv: iv,
-            fileName: file.name,
-            fileType: file.type,
-            fileSize: file.size,
-            messageId: messageId
-        }, true);
         
         showOfflineToast('Image sent successfully!');
         
     } catch (error) {
-        console.error('Error sending image:', error);
-        alert('Failed to send image');
+        console.error('Error uploading image:', error);
+        showOfflineToast('Failed to send image');
     }
 }
 
-// Replace the old sendImage function call
-async function sendImage(file) {
-    // Use chunked sending for files over 1MB
-    if (file.size > 1024 * 1024) {
-        return sendImageChunked(file);
-    }
-    
-    // Original method for small files (under 1MB)
-    if (!currentChatUser || !isUserOnline(currentChatUser)) {
-        showOfflineToast('User is offline. Cannot send images.');
-        return;
-    }
-    
+// Handle image notification
+socket.on('image-notification', async (data) => {
     try {
-        const arrayBuffer = await file.arrayBuffer();
-        const { encrypted, iv } = await encryption.encryptFile(
-            arrayBuffer,
-            currentChatUser
-        );
-        
-        const messageId = `${Date.now()}-${Math.random()}`;
-        
-        const imageData = {
-            encrypted: encrypted,
-            iv: iv,
-            fileName: file.name,
-            fileType: file.type,
-            fileSize: file.size,
-            messageId: messageId
-        };
-        
-        socket.emit('encrypted-image', {
-            targetUserId: currentChatUser,
-            imageData: imageData,
-            messageId: messageId,
-            senderInfo: {
-                userId: localStorage.getItem('userId'),
-                username: localStorage.getItem('username')
+        const response = await fetch(`${API_URL}/image/${data.messageId}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
         
-        displayImageMessage(imageData, true);
-        
-    } catch (error) {
-        console.error('Error sending image:', error);
-        alert('Failed to send image');
-    }
-}
-
-socket.on('image-start', (data) => {
-    // Initialize storage for this image's chunks
-    imageChunks.set(data.messageId, {
-        metadata: data,
-        chunks: new Array(data.totalChunks),
-        receivedChunks: 0
-    });
-    
-    // Show receiving progress
-    if (data.fromUserId === currentChatUser) {
-        showOfflineToast(`Receiving image from ${data.senderInfo.username}...`);
-    }
-});
-
-socket.on('image-chunk', async (data) => {
-    const imageData = imageChunks.get(data.messageId);
-    if (!imageData) return;
-    
-    // Store chunk
-    imageData.chunks[data.chunkIndex] = data.chunk;
-    imageData.receivedChunks++;
-    
-    // Update progress
-    const progress = Math.round((imageData.receivedChunks / imageData.metadata.totalChunks) * 100);
-    if (progress % 20 === 0 && data.fromUserId === currentChatUser) {
-        showOfflineToast(`Receiving: ${progress}%`);
-    }
-    
-    // Check if all chunks received
-    if (imageData.receivedChunks === imageData.metadata.totalChunks) {
-        // Reconstruct the encrypted data
-        const encryptedBase64 = imageData.chunks.join('');
-        
-        const completeImageData = {
-            encrypted: encryptedBase64,
-            iv: imageData.metadata.iv,
-            fileName: imageData.metadata.fileName,
-            fileType: imageData.metadata.fileType,
-            fileSize: imageData.metadata.fileSize,
-            messageId: imageData.metadata.messageId
-        };
-        
-        // Process as regular image
-        if (data.fromUserId === currentChatUser) {
-            displayImageMessage(completeImageData, false, imageData.metadata.senderInfo);
+        if (response.ok) {
+            const imageData = await response.json();
             
-            try {
-                const messageDiv = document.querySelector(`[data-message-id="${imageData.metadata.messageId}"]`);
+            if (data.fromUserId === currentChatUser) {
+                displayImageMessage(imageData, false, data.senderInfo);
+                
+                // Decrypt and display
+                const messageDiv = document.querySelector(`[data-message-id="${imageData.messageId}"]`);
                 if (messageDiv) {
                     const img = messageDiv.querySelector('img');
                     if (img) {
                         const decryptedBuffer = await encryption.decryptFile(
-                            encryptedBase64,
-                            imageData.metadata.iv,
+                            imageData.encryptedData,
+                            imageData.iv,
                             data.fromUserId
                         );
                         
-                        const blob = new Blob([decryptedBuffer], { type: imageData.metadata.fileType });
+                        const blob = new Blob([decryptedBuffer], { type: imageData.fileType });
                         const url = URL.createObjectURL(blob);
                         
                         img.src = url;
@@ -983,26 +839,28 @@ socket.on('image-chunk', async (data) => {
                         img.onclick = () => window.open(url, '_blank');
                     }
                 }
-                showOfflineToast('Image received successfully!');
-            } catch (error) {
-                console.error('Error decrypting chunked image:', error);
-                showOfflineToast('Error processing received image');
+            } else {
+                // Show notification
+                const sender = contacts.get(data.fromUserId);
+                showNotification(sender?.username || 'New Image', 'Sent you an image');
+                
+                // Add unread indicator
+                const contactDiv = document.getElementById(`contact-${data.fromUserId}`);
+                if (contactDiv && !contactDiv.classList.contains('has-unread')) {
+                    contactDiv.classList.add('has-unread');
+                }
             }
         }
-        
-        // Clean up
-        imageChunks.delete(data.messageId);
+    } catch (error) {
+        console.error('Error fetching image:', error);
     }
 });
 
-// Display image message in chat
+// Display image message
 function displayImageMessage(imageData, isSent = false, senderInfo = null) {
     const messagesContainer = document.getElementById('messagesContainer');
     
-    // Remove empty state or welcome screen if exists
-    const welcomeScreen = messagesContainer.querySelector('.welcome-screen');
     const emptyMessage = messagesContainer.querySelector('div[style*="text-align: center"]');
-    if (welcomeScreen) welcomeScreen.remove();
     if (emptyMessage) emptyMessage.remove();
     
     const messageDiv = document.createElement('div');
@@ -1012,7 +870,6 @@ function displayImageMessage(imageData, isSent = false, senderInfo = null) {
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-bubble';
     
-    // Add sender name for received messages (Yellow color in CSS)
     if (!isSent && senderInfo) {
         const senderName = document.createElement('div');
         senderName.className = 'message-sender';
@@ -1020,7 +877,6 @@ function displayImageMessage(imageData, isSent = false, senderInfo = null) {
         contentDiv.appendChild(senderName);
     }
     
-    // Create image wrapper with relative position
     const imageWrapper = document.createElement('div');
     imageWrapper.className = 'image-wrapper';
     
@@ -1028,7 +884,6 @@ function displayImageMessage(imageData, isSent = false, senderInfo = null) {
     img.className = 'message-image loading';
     img.alt = isSent ? 'Sent image' : 'Received image';
     
-    // Create time element inside the image wrapper
     const timeDiv = document.createElement('div');
     timeDiv.className = 'message-time-overlay';
     timeDiv.textContent = new Date().toLocaleTimeString('en-US', {
@@ -1037,7 +892,6 @@ function displayImageMessage(imageData, isSent = false, senderInfo = null) {
     });
     
     if (isSent) {
-        // For sent images, decrypt and display immediately
         (async () => {
             try {
                 const decryptedBuffer = await encryption.decryptFile(
@@ -1056,9 +910,6 @@ function displayImageMessage(imageData, isSent = false, senderInfo = null) {
                 img.classList.remove('loading');
             }
         })();
-    } else {
-        // Store data for later decryption when received
-        messageDiv.dataset.imageData = JSON.stringify(imageData);
     }
     
     imageWrapper.appendChild(img);
@@ -1070,62 +921,42 @@ function displayImageMessage(imageData, isSent = false, senderInfo = null) {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Handle receiving encrypted images
-socket.on('receive-image', async (data) => {
-    const { imageData, fromUserId, senderInfo } = data;
+// Image attachment button
+document.getElementById('attachImageBtn').addEventListener('click', () => {
+    if (!currentChatUser) {
+        alert('Please select a contact first');
+        return;
+    }
+    document.getElementById('imageInput').click();
+});
+
+// Handle image selection
+document.getElementById('imageInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
     
-    // Only process if this is the current chat
-    if (fromUserId !== currentChatUser) {
+    if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
         return;
     }
     
-    // Display received image with sender info
-    displayImageMessage(imageData, false, senderInfo);
-    
-    // Decrypt and display
-    try {
-        const messageDiv = document.querySelector(`[data-message-id="${imageData.messageId}"]`);
-        if (!messageDiv) {
-            console.error('Message div not found');
-            return;
-        }
-        
-        const img = messageDiv.querySelector('img');
-        if (!img) {
-            console.error('Image element not found');
-            return;
-        }
-        
-        const decryptedBuffer = await encryption.decryptFile(
-            imageData.encrypted,
-            imageData.iv,
-            fromUserId
-        );
-        
-        const blob = new Blob([decryptedBuffer], { type: imageData.fileType });
-        const url = URL.createObjectURL(blob);
-        
-        img.src = url;
-        img.classList.remove('loading');
-        img.onclick = () => window.open(url, '_blank');
-        
-    } catch (error) {
-        console.error('Error decrypting image:', error);
-        const messageDiv = document.querySelector(`[data-message-id="${imageData.messageId}"]`);
-        if (messageDiv) {
-            const img = messageDiv.querySelector('img');
-            if (img) {
-                img.alt = 'Error decrypting image';
-                img.classList.remove('loading');
-            }
-        }
+    if (file.size > MAX_IMAGE_SIZE) {
+        alert('Image size should be less than 10MB');
+        return;
     }
+    
+    if (!currentChatUser || !isUserOnline(currentChatUser)) {
+        showOfflineToast('User is offline. Cannot send images.');
+        return;
+    }
+    
+    await uploadImageViaHTTP(file, currentChatUser);
+    e.target.value = '';
 });
 
 // Logout
 document.getElementById('logoutBtn').addEventListener('click', async () => {
     try {
-        // Update online status
         await fetch(`${API_URL}/logout`, {
             method: 'POST',
             headers: {
@@ -1159,4 +990,3 @@ if ('Notification' in window && Notification.permission === 'default') {
 
 // Initialize
 initEncryption();
-// loadContacts();
