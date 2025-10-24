@@ -1,5 +1,5 @@
-const API_URL = 'http://localhost:3000/api';
-// const API_URL = 'https://secure-chat-app-8typ.onrender.com/api';
+// const API_URL = 'http://localhost:3000/api';
+const API_URL = 'https://test-secure-chat-app.onrender.com/api';
 
 // Password hashing utility using Web Crypto API
 class PasswordHasher {
@@ -166,7 +166,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             document.getElementById('loginForm').reset();
             
             setTimeout(() => {
-                window.location.href = '/client/chat.html';
+                window.location.href = '/chat.html';
             }, 1500);
         } else {
             showMessage(data.message || 'Login failed', 'error');
@@ -248,7 +248,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             // Show user ID in a more prominent way
             setTimeout(() => {
                 if (confirm(`Your unique ID is: ${data.userId}\n\nPlease save this ID. You'll need it to share with others.\n\nClick OK to continue to chat.`)) {
-                    window.location.href = '/client/chat.html';
+                    window.location.href = '/chat.html';
                 }
             }, 1000);
         } else {
@@ -293,7 +293,7 @@ function addPasswordToggle() {
 if (localStorage.getItem('token') && sessionStorage.getItem('sessionActive')) {
     showMessage('Already logged in. Redirecting...', 'success');
     setTimeout(() => {
-        window.location.href = '/client/chat.html';
+        window.location.href = '/chat.html';
     }, 1000);
 }
 
