@@ -1,6 +1,6 @@
 // Define the server URL
 // const SERVER_URL = 'http://localhost:3000';
-const SERVER_URL = 'https://test-secure-chat-app-1.onrender.com';
+const SERVER_URL = 'https://test-secure-chat-app.onrender.com';
 const API_URL = `${SERVER_URL}/api`;
 const IS_PRODUCTION = SERVER_URL.includes('onrender.com') || !SERVER_URL.includes('localhost');
 
