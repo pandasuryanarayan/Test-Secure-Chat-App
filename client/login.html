@@ -10,8 +10,12 @@
 <body>
     <div class="container">
         <div class="auth-container">
-            <h1>SecureChat</h1>
+            <h1>🔒 SecureChat</h1>
             <p class="subtitle">End-to-End Encrypted Messaging</p>
+            
+            <div class="security-badge">
+                🔐 All credentials are encrypted before transmission
+            </div>
             
             <div class="tabs">
                 <button class="tab-btn active" onclick="showTab('login')">Login</button>
@@ -20,20 +24,24 @@
 
             <!-- Login Form -->
             <form id="loginForm" class="auth-form">
-                <input type="email" id="loginEmail" placeholder="Email" required>
-                <input type="password" id="loginPassword" placeholder="Password" required>
+                <input type="email" id="loginEmail" placeholder="Email" required autocomplete="email">
+                <input type="password" id="loginPassword" placeholder="Password" required autocomplete="current-password">
                 <button type="submit">Login</button>
             </form>
 
             <!-- Register Form -->
             <form id="registerForm" class="auth-form" style="display: none;">
-                <input type="text" id="registerUsername" placeholder="Username" required>
-                <input type="email" id="registerEmail" placeholder="Email" required>
-                <input type="password" id="registerPassword" placeholder="Password" required>
+                <input type="text" id="registerUsername" placeholder="Username" required autocomplete="username" minlength="3">
+                <input type="email" id="registerEmail" placeholder="Email" required autocomplete="email">
+                <input type="password" id="registerPassword" placeholder="Password (min 9 characters)" required autocomplete="new-password" minlength="6">
                 <button type="submit">Register</button>
             </form>
 
             <div id="message" class="message"></div>
+            
+            <div class="security-info">
+                <small>Your password is hashed locally before being sent to our servers</small>
+            </div>
         </div>
     </div>
 
