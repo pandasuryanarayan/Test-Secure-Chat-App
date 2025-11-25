@@ -1,6 +1,6 @@
 // Define the server URL
-// const SERVER_URL = 'http://localhost:3000';
-const SERVER_URL = 'https://test-secure-chat-app.onrender.com';
+const SERVER_URL = 'http://localhost:3000'; // Your Express server URL
+// const SERVER_URL = 'https://secure-chat-app-8typ.onrender.com';
 const API_URL = `${SERVER_URL}/api`;
 const IS_PRODUCTION = SERVER_URL.includes('onrender.com') || !SERVER_URL.includes('localhost');
 
@@ -13,7 +13,7 @@ try {
         reconnection: true,
         reconnectionAttempts: 10,
         reconnectionDelay: 1000,
-        maxHttpBufferSize: 1e6, // 1MB for socket messages only
+        maxHttpBufferSize: 1e6,
         pingTimeout: 60000,
         pingInterval: 25000,
         upgrade: true,
@@ -56,8 +56,47 @@ let processedMessages = new Set();
 
 // Image handling utilities
 const imageChunks = new Map();
-const CHUNK_SIZE = 256 * 1024; // 256KB chunks for production
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB max
+const CHUNK_SIZE = 256 * 1024;
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+
+// ============================================
+// DOM Element References (New IDs)
+// ============================================
+const DOM = {
+    // Profile
+    profileUsername: () => document.getElementById('profileUsername'),
+    profileUserId: () => document.getElementById('profileUserId'),
+    copyIdBtn: () => document.getElementById('copyIdBtn'),
+    
+    // Search/Connect
+    contactSearchInput: () => document.getElementById('contactSearchInput'),
+    connectBtn: () => document.getElementById('connectBtn'),
+    
+    // Contacts
+    contactsList: () => document.getElementById('contactsList'),
+    
+    // Chat Header
+    chatPartnerName: () => document.getElementById('chatPartnerName'),
+    chatPartnerStatus: () => document.getElementById('chatPartnerStatus'),
+    
+    // Messages
+    messagesContainer: () => document.getElementById('messagesContainer'),
+    
+    // Input
+    messageInput: () => document.getElementById('messageInput'),
+    sendBtn: () => document.getElementById('sendBtn'),
+    emojiBtn: () => document.getElementById('emojiBtn'),
+    attachImageBtn: () => document.getElementById('attachImageBtn'),
+    imageInput: () => document.getElementById('imageInput'),
+    
+    // Typing
+    typingIndicator: () => document.getElementById('typingIndicator'),
+    typingUserName: () => document.getElementById('typingUserName'),
+    
+    // Other
+    logoutBtn: () => document.getElementById('logoutBtn'),
+    toastNotification: () => document.getElementById('toastNotification')
+};
 
 // Initialize encryption
 async function initEncryption() {
@@ -66,22 +105,49 @@ async function initEncryption() {
 
 // Check authentication
 if (!localStorage.getItem('token')) {
-    window.location.href = '/login.html';
+    window.location.href = '/client/login.html';
 }
 
-// Display user info
-document.getElementById('username').textContent = localStorage.getItem('username');
-document.getElementById('userId').textContent = localStorage.getItem('userId');
-document.getElementById('chatWith').textContent = '';
+// Display user info (using new IDs)
+function initUserDisplay() {
+    const profileUsername = DOM.profileUsername();
+    const profileUserId = DOM.profileUserId();
+    const chatPartnerName = DOM.chatPartnerName();
+    
+    if (profileUsername) {
+        profileUsername.textContent = localStorage.getItem('username') || 'User';
+    }
+    if (profileUserId) {
+        profileUserId.textContent = localStorage.getItem('userId') || '';
+    }
+    if (chatPartnerName) {
+        chatPartnerName.textContent = 'Select a contact';
+    }
+}
 
-// Show toast notification
-function showOfflineToast(message) {
-    const toast = document.getElementById('offlineToast');
+// Show toast notification (uses new toast element)
+function showOfflineToast(message, type = 'info') {
+    // Use global showToast if available (from app-init.js)
+    if (window.showToast) {
+        window.showToast(message, type);
+        return;
+    }
+    
+    // Fallback
+    const toast = DOM.toastNotification();
+    if (!toast) return;
+    
     toast.textContent = message;
-    toast.classList.add('show');
+    toast.className = 'sc-toast sc-toast--visible';
+    
+    if (type === 'error') {
+        toast.classList.add('sc-toast--error');
+    } else if (type === 'success') {
+        toast.classList.add('sc-toast--success');
+    }
     
     setTimeout(() => {
-        toast.classList.remove('show');
+        toast.classList.remove('sc-toast--visible');
     }, 3000);
 }
 
@@ -92,18 +158,28 @@ function isUserOnline(userId) {
 
 // Update empty state in contacts list
 function updateContactsEmptyState() {
-    const contactsList = document.getElementById('contactsList');
+    const contactsList = DOM.contactsList();
+    if (!contactsList) return;
+    
     const hasContacts = contacts.size > 0;
     
     if (!hasContacts) {
         contactsList.innerHTML = `
-            <div class="empty-state" style="padding: 20px; text-align: center; color: var(--text-secondary);">
-                <p>No contacts yet</p>
-                <small>Add contacts using their 6-digit ID</small>
+            <div class="sc-contacts__empty">
+                <div class="sc-contacts__empty-icon">
+                    <svg class="sc-icon sc-icon--xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <p class="sc-contacts__empty-title">No contacts yet</p>
+                <p class="sc-contacts__empty-subtitle">Add someone to start chatting</p>
             </div>
         `;
     } else {
-        const emptyState = contactsList.querySelector('.empty-state');
+        const emptyState = contactsList.querySelector('.sc-contacts__empty');
         if (emptyState) {
             emptyState.remove();
         }
@@ -143,12 +219,18 @@ function getBufferedMessages(userId) {
 
 // Update message controls based on user status
 function updateMessageControls() {
-    const messageInput = document.getElementById('messageInput');
-    const sendBtn = document.getElementById('sendBtn');
+    const messageInput = DOM.messageInput();
+    const sendBtn = DOM.sendBtn();
+    const emojiBtn = DOM.emojiBtn();
+    const attachImageBtn = DOM.attachImageBtn();
+    
+    if (!messageInput || !sendBtn) return;
     
     if (!currentChatUser) {
         messageInput.disabled = true;
         sendBtn.disabled = true;
+        if (emojiBtn) emojiBtn.disabled = true;
+        if (attachImageBtn) attachImageBtn.disabled = true;
         messageInput.placeholder = 'Select a contact to start chatting';
         return;
     }
@@ -159,76 +241,145 @@ function updateMessageControls() {
     if (!isOnline) {
         messageInput.disabled = true;
         sendBtn.disabled = true;
+        if (emojiBtn) emojiBtn.disabled = true;
+        if (attachImageBtn) attachImageBtn.disabled = true;
         messageInput.placeholder = `${user?.username || 'User'} is offline`;
-        sendBtn.style.opacity = '0.5';
     } else {
         messageInput.disabled = false;
         sendBtn.disabled = false;
-        messageInput.placeholder = 'Type a message...(Shift+Enter for new line)';
-        sendBtn.style.opacity = '1';
+        if (emojiBtn) emojiBtn.disabled = false;
+        if (attachImageBtn) attachImageBtn.disabled = false;
+        messageInput.placeholder = 'Type a secure message...';
     }
 }
 
 // Copy ID button
-document.getElementById('copyIdBtn').addEventListener('click', () => {
-    const userId = localStorage.getItem('userId');
-    navigator.clipboard.writeText(userId);
-    document.getElementById('copyIdBtn').textContent = 'Copied!';
-    setTimeout(() => {
-        document.getElementById('copyIdBtn').textContent = 'Copy ID';
-    }, 2000);
+document.addEventListener('DOMContentLoaded', () => {
+    const copyIdBtn = DOM.copyIdBtn();
+    
+    if (copyIdBtn) {
+        copyIdBtn.addEventListener('click', async () => {
+            const userId = localStorage.getItem('userId');
+            
+            try {
+                await navigator.clipboard.writeText(userId);
+                
+                // Store original content
+                const originalHTML = copyIdBtn.innerHTML;
+                
+                // Add success state
+                copyIdBtn.classList.add('sc-profile__copy-btn--copied');
+                
+                // Change to checkmark icon
+                copyIdBtn.innerHTML = `
+                    <svg class="sc-icon sc-icon--xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span class="sc-profile__copy-text">Copied!</span>
+                `;
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    copyIdBtn.classList.remove('sc-profile__copy-btn--copied');
+                    copyIdBtn.innerHTML = originalHTML;
+                }, 2000);
+                
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = userId;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Show feedback
+                const originalHTML = copyIdBtn.innerHTML;
+                copyIdBtn.classList.add('sc-profile__copy-btn--copied');
+                copyIdBtn.innerHTML = `
+                    <svg class="sc-icon sc-icon--xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span class="sc-profile__copy-text">Copied!</span>
+                `;
+                
+                setTimeout(() => {
+                    copyIdBtn.classList.remove('sc-profile__copy-btn--copied');
+                    copyIdBtn.innerHTML = originalHTML;
+                }, 2000);
+            }
+        });
+    }
 });
 
 // Search and connect with user
-document.getElementById('searchBtn').addEventListener('click', async () => {
-    const searchId = document.getElementById('searchInput').value.trim();
+document.addEventListener('DOMContentLoaded', () => {
+    const connectBtn = DOM.connectBtn();
+    const contactSearchInput = DOM.contactSearchInput();
     
-    if (searchId.length !== 6) {
-        showOfflineToast('Please enter a valid 6-digit ID');
-        return;
-    }
+    if (connectBtn) {
+        connectBtn.addEventListener('click', async () => {
+            const searchId = contactSearchInput?.value.trim();
+            
+            if (!searchId || searchId.length !== 6) {
+                showOfflineToast('Please enter a valid 6-digit ID', 'error');
+                return;
+            }
 
-    if (searchId === localStorage.getItem('userId')) {
-        showOfflineToast('You cannot add yourself as a contact');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`${API_URL}/user/${searchId}`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            if (searchId === localStorage.getItem('userId')) {
+                showOfflineToast('You cannot add yourself as a contact', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/user/${searchId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    contacts.set(user.userId, user);
+
+                    if (user.isOnline) {
+                        onlineUsers.add(user.userId);
+                    }
+
+                    updateContactsEmptyState();
+                    displayContact(user);
+
+                    socket.emit('contact-added', {
+                        targetUserId: user.userId,
+                        addedBy: {
+                            userId: localStorage.getItem('userId'),
+                            username: localStorage.getItem('username')
+                        }
+                    });
+
+                    await initiateKeyExchange(user.userId);
+                    
+                    if (contactSearchInput) contactSearchInput.value = '';
+                    showOfflineToast(`Connected with ${user.username}`, 'success');
+                } else {
+                    const error = await response.json();
+                    showOfflineToast(error.message || 'User not found', 'error');
+                }
+            } catch (error) {
+                showOfflineToast('Error connecting to user', 'error');
             }
         });
-        
-        if (response.ok) {
-            const user = await response.json();
-            contacts.set(user.userId, user);
-
-            if (user.isOnline) {
-                onlineUsers.add(user.userId);
+    }
+    
+    // Allow Enter key to connect
+    if (contactSearchInput) {
+        contactSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                connectBtn?.click();
             }
-
-            updateContactsEmptyState();
-            displayContact(user);
-
-            socket.emit('contact-added', {
-                targetUserId: user.userId,
-                addedBy: {
-                    userId: localStorage.getItem('userId'),
-                    username: localStorage.getItem('username')
-                }
-            });
-
-            await initiateKeyExchange(user.userId);
-            
-            document.getElementById('searchInput').value = '';
-            showOfflineToast(`Successfully connected with ${user.username}`);
-        } else {
-            const error = await response.json();
-            showOfflineToast(error.message || 'User not found');
-        }
-    } catch (error) {
-        showOfflineToast('Error connecting to user. Please try again.');
+        });
     }
 });
 
@@ -258,10 +409,12 @@ socket.on('contact-added', async (data) => {
     }
 });
 
-// Display contact in sidebar
+// Display contact in sidebar (using new classes)
 function displayContact(user) {
-    const contactsList = document.getElementById('contactsList');
-    const emptyState = contactsList.querySelector('.empty-state');
+    const contactsList = DOM.contactsList();
+    if (!contactsList) return;
+    
+    const emptyState = contactsList.querySelector('.sc-contacts__empty');
     if (emptyState) {
         emptyState.remove();
     }
@@ -270,19 +423,26 @@ function displayContact(user) {
     
     if (!contactDiv) {
         contactDiv = document.createElement('div');
-        contactDiv.className = 'contact-item';
+        contactDiv.className = 'sc-contact';
         contactDiv.id = `contact-${user.userId}`;
         contactsList.appendChild(contactDiv);
     }
 
     const isOnline = onlineUsers.has(user.userId);
+    
     contactDiv.innerHTML = `
-        <div class="contact-info">
-            <div class="contact-name">${user.username}</div>
-            <small>ID: ${user.userId}</small>
+        <div class="sc-contact__avatar">
+            <svg class="sc-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="sc-contact__status-dot ${isOnline ? 'sc-contact__status-dot--online' : 'sc-contact__status-dot--offline'}"></span>
         </div>
-        <div class="contact-status">
-            ${isOnline ? '<div class="online-indicator"></div>' : '<div class="offline-indicator"></div>'}
+        <div class="sc-contact__info">
+            <div class="sc-contact__name">${user.username}</div>
+            <div class="sc-contact__preview">ID: ${user.userId}</div>
+        </div>
+        <div class="sc-contact__meta">
+            <span class="sc-contact__time">${isOnline ? 'Online' : 'Offline'}</span>
         </div>
     `;
 
@@ -293,25 +453,37 @@ function displayContact(user) {
 function selectContact(user) {
     currentChatUser = user.userId;
     
-    document.querySelectorAll('.contact-item').forEach(item => {
-        item.classList.remove('active');
+    // Update active state (using new classes)
+    document.querySelectorAll('.sc-contact').forEach(item => {
+        item.classList.remove('sc-contact--active');
     });
-    document.getElementById(`contact-${user.userId}`).classList.add('active');
+    
+    const contactElement = document.getElementById(`contact-${user.userId}`);
+    if (contactElement) {
+        contactElement.classList.add('sc-contact--active');
+        contactElement.classList.remove('sc-contact--unread');
+    }
 
     const isOnline = onlineUsers.has(user.userId);
-    document.getElementById('chatWith').innerHTML = `
-        ${user.username} 
-        <span class="status-badge ${isOnline ? 'online' : 'offline'}">
-            ${isOnline ? '● Online' : '● Offline'}
-        </span>
-    `;
+    
+    // Update chat header (using new IDs)
+    const chatPartnerName = DOM.chatPartnerName();
+    const chatPartnerStatus = DOM.chatPartnerStatus();
+    
+    if (chatPartnerName) {
+        chatPartnerName.textContent = user.username;
+    }
+    
+    if (chatPartnerStatus) {
+        chatPartnerStatus.textContent = isOnline ? 'Online' : 'Offline';
+        chatPartnerStatus.className = `sc-chat__user-status ${isOnline ? 'sc-chat__user-status--online' : ''}`;
+    }
 
     updateMessageControls();
-    document.getElementById('messagesContainer').innerHTML = '';
-
-    const contactDiv = document.getElementById(`contact-${user.userId}`);
-    if (contactDiv) {
-        contactDiv.classList.remove('has-unread');
+    
+    const messagesContainer = DOM.messagesContainer();
+    if (messagesContainer) {
+        messagesContainer.innerHTML = '';
     }
 
     processedMessages.clear();
@@ -325,11 +497,18 @@ function selectContact(user) {
             }
         });
     } else {
-        document.getElementById('messagesContainer').innerHTML = `
-            <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
-                <p>Start a conversation with ${user.username}</p>
-            </div>
-        `;
+        if (messagesContainer) {
+            messagesContainer.innerHTML = `
+                <div class="sc-welcome sc-welcome--mini">
+                    <div class="sc-welcome__icon">
+                        <svg class="sc-icon sc-icon--xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
+                    <p class="sc-welcome__description">Start a conversation with ${user.username}</p>
+                </div>
+            `;
+        }
     }
 }
 
@@ -358,8 +537,8 @@ socket.on('pending-messages', async (data) => {
                 displayMessage(decryptedMessage, 'received', fromUserId, new Date(msgData.timestamp));
             } else {
                 const contactDiv = document.getElementById(`contact-${fromUserId}`);
-                if (contactDiv && !contactDiv.classList.contains('has-unread')) {
-                    contactDiv.classList.add('has-unread');
+                if (contactDiv && !contactDiv.classList.contains('sc-contact--unread')) {
+                    contactDiv.classList.add('sc-contact--unread');
                 }
             }
         } catch (error) {
@@ -379,10 +558,16 @@ socket.on('user-online', (data) => {
         displayContact(user);
         
         if (currentChatUser === userId) {
-            document.getElementById('chatWith').innerHTML = `
-                ${username} 
-                <span class="status-badge online">● Online</span>
-            `;
+            const chatPartnerName = DOM.chatPartnerName();
+            const chatPartnerStatus = DOM.chatPartnerStatus();
+            
+            if (chatPartnerName) {
+                chatPartnerName.textContent = username;
+            }
+            if (chatPartnerStatus) {
+                chatPartnerStatus.textContent = 'Online';
+                chatPartnerStatus.className = 'sc-chat__user-status sc-chat__user-status--online';
+            }
             updateMessageControls();
         }
     }
@@ -399,10 +584,11 @@ socket.on('user-offline', (data) => {
         displayContact(user);
         
         if (currentChatUser === userId) {
-            document.getElementById('chatWith').innerHTML = `
-                ${user.username} 
-                <span class="status-badge offline">● Offline</span>
-            `;
+            const chatPartnerStatus = DOM.chatPartnerStatus();
+            if (chatPartnerStatus) {
+                chatPartnerStatus.textContent = 'Offline';
+                chatPartnerStatus.className = 'sc-chat__user-status';
+            }
             updateMessageControls();
         }
     }
@@ -443,18 +629,30 @@ socket.on('key-exchange', async (data) => {
 });
 
 // Send message
-document.getElementById('sendBtn').addEventListener('click', sendMessage);
-document.getElementById('messageInput').addEventListener('input', handleTyping);
+document.addEventListener('DOMContentLoaded', () => {
+    const sendBtn = DOM.sendBtn();
+    const messageInput = DOM.messageInput();
+    
+    if (sendBtn) {
+        sendBtn.addEventListener('click', sendMessage);
+    }
+    
+    if (messageInput) {
+        messageInput.addEventListener('input', handleTyping);
+    }
+});
 
 async function sendMessage() {
-    const messageInput = document.getElementById('messageInput');
+    const messageInput = DOM.messageInput();
+    if (!messageInput) return;
+    
     const message = messageInput.value.trim();
     
     if (!message || !currentChatUser) return;
     
     if (!isUserOnline(currentChatUser)) {
         const user = contacts.get(currentChatUser);
-        showOfflineToast(`${user?.username || 'User'} is offline. Message cannot be sent.`);
+        showOfflineToast(`${user?.username || 'User'} is offline`, 'error');
         return;
     }
     
@@ -486,7 +684,7 @@ async function sendMessage() {
         }
     } catch (error) {
         console.error('Error sending message:', error);
-        showOfflineToast('Error sending message. Please try again.');
+        showOfflineToast('Error sending message', 'error');
     }
 }
 
@@ -531,8 +729,8 @@ socket.on('receive-message', async (data) => {
             showNotification(sender?.username || 'New Message', decryptedMessage);
             
             const contactDiv = document.getElementById(`contact-${data.fromUserId}`);
-            if (contactDiv && !contactDiv.classList.contains('has-unread')) {
-                contactDiv.classList.add('has-unread');
+            if (contactDiv && !contactDiv.classList.contains('sc-contact--unread')) {
+                contactDiv.classList.add('sc-contact--unread');
             }
         }
         
@@ -541,36 +739,43 @@ socket.on('receive-message', async (data) => {
     }
 });
 
-// Display message in chat
+// Display message in chat (using new classes)
 function displayMessage(message, type, fromUserId = null, timestamp = new Date()) {
-    const messagesContainer = document.getElementById('messagesContainer');
+    const messagesContainer = DOM.messagesContainer();
+    if (!messagesContainer) return;
     
-    const emptyMessage = messagesContainer.querySelector('div[style*="text-align: center"]');
-    const noChatSelected = messagesContainer.querySelector('.no-chat-selected');
-    if (emptyMessage) emptyMessage.remove();
-    if (noChatSelected) noChatSelected.remove();
+    // Remove welcome message
+    const welcomeMessage = messagesContainer.querySelector('.sc-welcome');
+    if (welcomeMessage) welcomeMessage.remove();
     
     const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${type}`;
+    messageDiv.className = `sc-message sc-message--${type}`;
     
     const time = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
     let senderName = '';
     if (type === 'received' && fromUserId) {
         const sender = contacts.get(fromUserId);
-        senderName = `<div class="message-sender">${sender?.username || 'Unknown'}</div>`;
+        senderName = `<div class="sc-message__sender">${sender?.username || 'Unknown'}</div>`;
     }
     
     messageDiv.innerHTML = `
-        <div class="message-bubble">
+        <div class="sc-message__bubble">
             ${senderName}
-            <div>${message}</div>
-            <div class="message-time">${time}</div>
+            <div class="sc-message__text">${escapeHtml(message)}</div>
+            <div class="sc-message__time">${time}</div>
         </div>
     `;
     
     messagesContainer.appendChild(messageDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // Typing indicator
@@ -592,18 +797,24 @@ function handleTyping() {
 }
 
 socket.on('user-typing', (data) => {
-    const typingIndicator = document.getElementById('typingIndicator');
+    const typingIndicator = DOM.typingIndicator();
+    const typingUserName = DOM.typingUserName();
+    
+    if (!typingIndicator) return;
+    
     if (data.isTyping && data.userId === currentChatUser) {
         const user = contacts.get(data.userId);
-        typingIndicator.querySelector('span').textContent = user?.username || 'User';
-        typingIndicator.style.display = 'block';
+        if (typingUserName) {
+            typingUserName.textContent = user?.username || 'User';
+        }
+        typingIndicator.classList.add('sc-typing--visible');
     } else {
-        typingIndicator.style.display = 'none';
+        typingIndicator.classList.remove('sc-typing--visible');
     }
 });
 
 // ====================
-// IMAGE HANDLING - INDUSTRIAL LEVEL
+// IMAGE HANDLING
 // ====================
 
 // Compress image with quality adjustment
@@ -619,7 +830,6 @@ async function compressImage(file, maxWidth = 1920, maxHeight = 1080, targetSize
                 let width = img.width;
                 let height = img.height;
                 
-                // Calculate new dimensions
                 if (width > height) {
                     if (width > maxWidth) {
                         height = Math.round(height * (maxWidth / width));
@@ -655,8 +865,6 @@ async function compressImage(file, maxWidth = 1920, maxHeight = 1080, targetSize
                         blob = await tryCompress(quality);
                     }
                     
-                    console.log(`Compressed: ${(file.size/1024/1024).toFixed(2)}MB -> ${(blob.size/1024/1024).toFixed(2)}MB`);
-                    
                     resolve(new File([blob], file.name, {
                         type: 'image/jpeg',
                         lastModified: Date.now()
@@ -671,12 +879,11 @@ async function compressImage(file, maxWidth = 1920, maxHeight = 1080, targetSize
     });
 }
 
-// Upload image via HTTP (production-ready)
+// Upload image via HTTP
 async function uploadImageViaHTTP(file, targetUserId) {
     try {
         showOfflineToast('Processing image...');
         
-        // Compress if large
         let fileToUpload = file;
         if (file.size > 1 * 1024 * 1024) {
             showOfflineToast('Compressing image...');
@@ -690,19 +897,16 @@ async function uploadImageViaHTTP(file, targetUserId) {
         
         const messageId = `img-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         
-        // Split into chunks if needed
         const chunks = [];
-        const chunkSize = 500 * 1024; // 500KB chunks
+        const chunkSize = 500 * 1024;
         
         for (let i = 0; i < encrypted.length; i += chunkSize) {
             chunks.push(encrypted.slice(i, i + chunkSize));
         }
         
         if (chunks.length > 1) {
-            // Upload in chunks
             showOfflineToast(`Uploading in ${chunks.length} parts...`);
             
-            // Send metadata
             const metadataResponse = await fetch(`${API_URL}/image/metadata`, {
                 method: 'POST',
                 headers: {
@@ -725,7 +929,6 @@ async function uploadImageViaHTTP(file, targetUserId) {
                 throw new Error('Failed to send metadata');
             }
             
-            // Upload chunks
             for (let i = 0; i < chunks.length; i++) {
                 const chunkResponse = await fetch(`${API_URL}/image/chunk`, {
                     method: 'POST',
@@ -751,7 +954,6 @@ async function uploadImageViaHTTP(file, targetUserId) {
                 }
             }
         } else {
-            // Single upload for small images
             showOfflineToast('Uploading image...');
             
             const response = await fetch(`${API_URL}/image/upload`, {
@@ -777,7 +979,6 @@ async function uploadImageViaHTTP(file, targetUserId) {
             }
         }
         
-        // Display locally
         displayImageMessage({
             messageId,
             encrypted,
@@ -787,7 +988,6 @@ async function uploadImageViaHTTP(file, targetUserId) {
             fileSize: fileToUpload.size
         }, true);
         
-        // Notify via socket
         socket.emit('image-notification', {
             targetUserId,
             messageId,
@@ -797,11 +997,11 @@ async function uploadImageViaHTTP(file, targetUserId) {
             }
         });
         
-        showOfflineToast('Image sent successfully!');
+        showOfflineToast('Image sent!', 'success');
         
     } catch (error) {
         console.error('Error uploading image:', error);
-        showOfflineToast('Failed to send image');
+        showOfflineToast('Failed to send image', 'error');
     }
 }
 
@@ -820,7 +1020,6 @@ socket.on('image-notification', async (data) => {
             if (data.fromUserId === currentChatUser) {
                 displayImageMessage(imageData, false, data.senderInfo);
                 
-                // Decrypt and display
                 const messageDiv = document.querySelector(`[data-message-id="${imageData.messageId}"]`);
                 if (messageDiv) {
                     const img = messageDiv.querySelector('img');
@@ -836,18 +1035,15 @@ socket.on('image-notification', async (data) => {
                         
                         img.src = url;
                         img.classList.remove('loading');
-                        img.onclick = () => window.open(url, '_blank');
                     }
                 }
             } else {
-                // Show notification
                 const sender = contacts.get(data.fromUserId);
                 showNotification(sender?.username || 'New Image', 'Sent you an image');
                 
-                // Add unread indicator
                 const contactDiv = document.getElementById(`contact-${data.fromUserId}`);
-                if (contactDiv && !contactDiv.classList.contains('has-unread')) {
-                    contactDiv.classList.add('has-unread');
+                if (contactDiv && !contactDiv.classList.contains('sc-contact--unread')) {
+                    contactDiv.classList.add('sc-contact--unread');
                 }
             }
         }
@@ -856,36 +1052,37 @@ socket.on('image-notification', async (data) => {
     }
 });
 
-// Display image message
+// Display image message (using new classes)
 function displayImageMessage(imageData, isSent = false, senderInfo = null) {
-    const messagesContainer = document.getElementById('messagesContainer');
+    const messagesContainer = DOM.messagesContainer();
+    if (!messagesContainer) return;
     
-    const emptyMessage = messagesContainer.querySelector('div[style*="text-align: center"]');
-    if (emptyMessage) emptyMessage.remove();
+    const welcomeMessage = messagesContainer.querySelector('.sc-welcome');
+    if (welcomeMessage) welcomeMessage.remove();
     
     const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+    messageDiv.className = `sc-message sc-message--${isSent ? 'sent' : 'received'}`;
     messageDiv.dataset.messageId = imageData.messageId;
     
-    const contentDiv = document.createElement('div');
-    contentDiv.className = 'message-bubble';
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'sc-message__bubble';
     
     if (!isSent && senderInfo) {
         const senderName = document.createElement('div');
-        senderName.className = 'message-sender';
+        senderName.className = 'sc-message__sender';
         senderName.textContent = senderInfo.username || 'Unknown';
-        contentDiv.appendChild(senderName);
+        bubbleDiv.appendChild(senderName);
     }
     
     const imageWrapper = document.createElement('div');
-    imageWrapper.className = 'image-wrapper';
+    imageWrapper.className = 'sc-message__image-wrapper';
     
     const img = document.createElement('img');
-    img.className = 'message-image loading';
+    img.className = 'sc-message__image loading';
     img.alt = isSent ? 'Sent image' : 'Received image';
     
     const timeDiv = document.createElement('div');
-    timeDiv.className = 'message-time-overlay';
+    timeDiv.className = 'sc-message__time-overlay';
     timeDiv.textContent = new Date().toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit'
@@ -903,7 +1100,6 @@ function displayImageMessage(imageData, isSent = false, senderInfo = null) {
                 const url = URL.createObjectURL(blob);
                 img.src = url;
                 img.classList.remove('loading');
-                img.onclick = () => window.open(url, '_blank');
             } catch (error) {
                 console.error('Error displaying sent image:', error);
                 img.alt = 'Error loading image';
@@ -914,63 +1110,77 @@ function displayImageMessage(imageData, isSent = false, senderInfo = null) {
     
     imageWrapper.appendChild(img);
     imageWrapper.appendChild(timeDiv);
-    contentDiv.appendChild(imageWrapper);
+    bubbleDiv.appendChild(imageWrapper);
     
-    messageDiv.appendChild(contentDiv);
+    messageDiv.appendChild(bubbleDiv);
     messagesContainer.appendChild(messageDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
 // Image attachment button
-document.getElementById('attachImageBtn').addEventListener('click', () => {
-    if (!currentChatUser) {
-        alert('Please select a contact first');
-        return;
-    }
-    document.getElementById('imageInput').click();
-});
-
-// Handle image selection
-document.getElementById('imageInput').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+document.addEventListener('DOMContentLoaded', () => {
+    const attachImageBtn = DOM.attachImageBtn();
+    const imageInput = DOM.imageInput();
     
-    if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
-        return;
+    if (attachImageBtn) {
+        attachImageBtn.addEventListener('click', () => {
+            if (!currentChatUser) {
+                showOfflineToast('Please select a contact first', 'error');
+                return;
+            }
+            imageInput?.click();
+        });
     }
     
-    if (file.size > MAX_IMAGE_SIZE) {
-        alert('Image size should be less than 10MB');
-        return;
+    if (imageInput) {
+        imageInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                showOfflineToast('Please select an image file', 'error');
+                return;
+            }
+            
+            if (file.size > MAX_IMAGE_SIZE) {
+                showOfflineToast('Image size should be less than 10MB', 'error');
+                return;
+            }
+            
+            if (!currentChatUser || !isUserOnline(currentChatUser)) {
+                showOfflineToast('User is offline', 'error');
+                return;
+            }
+            
+            await uploadImageViaHTTP(file, currentChatUser);
+            e.target.value = '';
+        });
     }
-    
-    if (!currentChatUser || !isUserOnline(currentChatUser)) {
-        showOfflineToast('User is offline. Cannot send images.');
-        return;
-    }
-    
-    await uploadImageViaHTTP(file, currentChatUser);
-    e.target.value = '';
 });
 
 // Logout
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-    try {
-        await fetch(`${API_URL}/logout`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
+document.addEventListener('DOMContentLoaded', () => {
+    const logoutBtn = DOM.logoutBtn();
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await fetch(`${API_URL}/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
             }
-        });
-    } catch (error) {
-        console.error('Logout error:', error);
-    }
 
-    localStorage.clear();
-    socket.disconnect();
-    window.location.href = '/login.html';
+            localStorage.clear();
+            socket.disconnect();
+            window.location.href = '/client/login.html';
+        });
+    }
 });
 
 // Show notification
@@ -978,7 +1188,7 @@ function showNotification(title, message) {
     if (Notification.permission === 'granted') {
         new Notification(title, {
             body: message,
-            icon: '/notification.png'
+            icon: '/client/notification.png'
         });
     }
 }
@@ -988,5 +1198,9 @@ if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
 }
 
-// Initialize
-initEncryption();
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    initUserDisplay();
+    initEncryption();
+    updateContactsEmptyState();
+});
