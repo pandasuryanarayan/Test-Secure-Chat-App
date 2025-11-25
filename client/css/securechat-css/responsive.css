@@ -1,0 +1,316 @@
+/* ============================================
+   SecureChat - Responsive Styles
+   ============================================ */
+
+/* ============================================
+   Tablet (769px - 1024px)
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .sc-sidebar {
+        width: 280px;
+    }
+    
+    .sc-message__bubble {
+        max-width: 75%;
+    }
+}
+
+/* ============================================
+   Mobile (max-width: 768px)
+   ============================================ */
+
+@media (max-width: 768px) {
+    :root {
+        --sc-sidebar-width: 100%;
+    }
+    
+    .sc-mobile-header {
+        display: flex;
+    }
+    
+    .sc-main {
+        height: calc(calc(var(--sc-vh, 1vh) * 100) - var(--sc-mobile-header-height));
+    }
+    
+    .sc-sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 300px;
+        height: calc(var(--sc-vh, 1vh) * 100);
+        z-index: var(--sc-z-modal);
+        transition: left var(--sc-transition-normal);
+    }
+    
+    .sc-sidebar--active {
+        left: 0;
+    }
+    
+    .sc-sidebar__close-btn {
+        display: flex;
+    }
+    
+    /* Profile Mobile Adjustments */
+    .sc-profile__copy-text {
+        display: none;
+    }
+    
+    .sc-profile__copy-btn {
+        padding: var(--sc-space-1);
+        width: 28px;
+        height: 28px;
+    }
+    
+    .sc-profile__avatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .sc-profile__name {
+        font-size: var(--sc-text-base);
+    }
+    
+    .sc-profile__id {
+        font-size: var(--sc-text-xs);
+    }
+    
+    /* Welcome Screen Mobile */
+    .sc-welcome__icon {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .sc-welcome__title {
+        font-size: var(--sc-text-xl);
+    }
+    
+    .sc-welcome__subtitle {
+        font-size: var(--sc-text-base);
+    }
+    
+    .sc-welcome__description {
+        font-size: var(--sc-text-sm);
+    }
+    
+    /* Messages Mobile */
+    .sc-message__bubble {
+        max-width: 85%;
+        padding: var(--sc-space-3);
+    }
+    
+    .sc-message__image {
+        max-width: 250px;
+        max-height: 250px;
+        min-width: 180px;
+        min-height: 130px;
+    }
+    
+    /* Chat Header Mobile */
+    .sc-encryption-indicator {
+        display: none;
+    }
+    
+    .sc-chat__header {
+        padding: 0 var(--sc-space-4);
+        height: var(--sc-mobile-header-height);
+    }
+    
+    /* Chat Footer Mobile */
+    .sc-chat__footer {
+        padding: var(--sc-space-3);
+    }
+    
+    /* Input Area Mobile */
+    .sc-input-area__textarea {
+        font-size: var(--sc-text-base);
+        max-height: 100px;
+    }
+    
+    .sc-input-area__attach-btn,
+    .sc-input-area__emoji-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .sc-input-area__send-btn {
+        width: 44px;
+        height: 44px;
+    }
+    
+    /* Emoji Picker Mobile */
+    .sc-emoji-picker {
+        left: var(--sc-space-2);
+        right: var(--sc-space-2);
+        max-width: calc(100vw - var(--sc-space-4));
+    }
+    
+    emoji-picker {
+        width: 100%;
+        max-width: 350px;
+        height: 350px;
+    }
+}
+
+/* ============================================
+   Small Mobile (max-width: 480px)
+   ============================================ */
+
+@media (max-width: 480px) {
+    .sc-sidebar {
+        width: 100%;
+    }
+    
+    .sc-mobile-header__title {
+        font-size: var(--sc-text-sm);
+    }
+    
+    .sc-mobile-header__menu-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .sc-profile__avatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .sc-profile__copy-btn {
+        width: 26px;
+        height: 26px;
+    }
+    
+    .sc-profile__copy-btn svg {
+        width: 12px;
+        height: 12px;
+    }
+    
+    .sc-chat__avatar {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .sc-chat__user-name {
+        font-size: var(--sc-text-base);
+    }
+    
+    .sc-input-area__textarea {
+        max-height: 80px;
+    }
+    
+    .sc-input-area__send-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .sc-message__image {
+        max-width: 220px;
+        max-height: 220px;
+    }
+    
+    emoji-picker {
+        height: 320px;
+    }
+}
+
+/* ============================================
+   Very Small Mobile (max-width: 360px)
+   ============================================ */
+
+@media (max-width: 360px) {
+    .sc-mobile-header__brand {
+        gap: var(--sc-space-1);
+    }
+    
+    .sc-mobile-header__logo {
+        display: none;
+    }
+    
+    .sc-btn--sm {
+        padding: var(--sc-space-1) var(--sc-space-2);
+    }
+}
+
+/* ============================================
+   Landscape Mode
+   ============================================ */
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .sc-mobile-header {
+        height: 48px;
+    }
+    
+    .sc-main {
+        height: calc(calc(var(--sc-vh, 1vh) * 100) - 48px);
+    }
+    
+    .sc-chat__header {
+        height: 48px;
+    }
+    
+    .sc-chat__messages {
+        padding: var(--sc-space-2);
+    }
+    
+    .sc-input-area__textarea {
+        max-height: 60px;
+        min-height: 40px;
+    }
+    
+    .sc-welcome__icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .sc-welcome__title {
+        font-size: var(--sc-text-lg);
+    }
+}
+
+/* ============================================
+   High DPI Screens
+   ============================================ */
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .sc-message__image {
+        image-rendering: -webkit-optimize-contrast;
+    }
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+
+@media print {
+    .sc-mobile-header,
+    .sc-sidebar,
+    .sc-chat__footer,
+    .sc-overlay,
+    .sc-toast,
+    .sc-modal {
+        display: none !important;
+    }
+    
+    .sc-chat {
+        width: 100%;
+    }
+    
+    .sc-chat__messages {
+        overflow: visible;
+        height: auto;
+    }
+}

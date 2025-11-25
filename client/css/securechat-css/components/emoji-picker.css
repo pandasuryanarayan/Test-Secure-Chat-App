@@ -1,0 +1,43 @@
+/* ============================================
+   SecureChat - Emoji Picker Component
+   ============================================ */
+
+.sc-emoji-picker {
+    position: absolute;
+    bottom: calc(100% + var(--sc-space-2));
+    left: var(--sc-space-4);
+    z-index: var(--sc-z-popover);
+    display: none;
+    border-radius: var(--sc-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--sc-shadow-xl);
+}
+
+.sc-emoji-picker--active {
+    display: block;
+    animation: sc-slide-up 0.2s ease;
+}
+
+/* ============================================
+   Emoji Picker Element Styles
+   ============================================ */
+
+emoji-picker {
+    --background: var(--sc-bg-secondary);
+    --border-color: var(--sc-border-color);
+    --indicator-color: var(--sc-color-primary);
+    --input-border-color: var(--sc-border-color);
+    --input-font-color: var(--sc-text-primary);
+    --input-placeholder-color: var(--sc-text-hint);
+    --outline-color: var(--sc-color-primary);
+    --category-font-color: var(--sc-text-secondary);
+    --button-active-background: var(--sc-bg-hover);
+    --button-hover-background: var(--sc-bg-hover);
+    width: 350px;
+    height: 400px;
+}
+
+emoji-picker.emoji-picker-dark {
+    --background: var(--sc-bg-secondary);
+    --border-color: var(--sc-border-color);
+}

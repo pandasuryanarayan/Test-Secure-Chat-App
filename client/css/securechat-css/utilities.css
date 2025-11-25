@@ -1,0 +1,188 @@
+/* ============================================
+   SecureChat - Utility Classes
+   ============================================ */
+
+/* ============================================
+   Icon Sizes
+   ============================================ */
+
+.sc-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.sc-icon--xs {
+    width: 14px;
+    height: 14px;
+}
+
+.sc-icon--sm {
+    width: 16px;
+    height: 16px;
+}
+
+.sc-icon--md {
+    width: 20px;
+    height: 20px;
+}
+
+.sc-icon--lg {
+    width: 24px;
+    height: 24px;
+}
+
+.sc-icon--xl {
+    width: 32px;
+    height: 32px;
+}
+
+.sc-icon--xxl {
+    width: 48px;
+    height: 48px;
+}
+
+/* ============================================
+   Modal Component
+   ============================================ */
+
+.sc-modal {
+    position: fixed;
+    inset: 0;
+    z-index: var(--sc-z-modal);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.sc-modal--active {
+    display: flex;
+}
+
+.sc-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+}
+
+.sc-modal__content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+.sc-modal__close {
+    position: absolute;
+    top: var(--sc-space-4);
+    right: var(--sc-space-4);
+    width: 40px;
+    height: 40px;
+    border-radius: var(--sc-radius-full);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all var(--sc-transition-fast);
+    cursor: pointer;
+    border: none;
+}
+
+.sc-modal__close:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
+}
+
+.sc-modal__image {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: var(--sc-radius-lg);
+    object-fit: contain;
+}
+
+/* ============================================
+   Toast Notifications
+   ============================================ */
+
+.sc-toast {
+    position: fixed;
+    bottom: var(--sc-space-8);
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--sc-bg-elevated);
+    color: var(--sc-text-primary);
+    padding: var(--sc-space-4) var(--sc-space-6);
+    border-radius: var(--sc-radius-lg);
+    font-size: var(--sc-text-base);
+    font-weight: var(--sc-font-medium);
+    box-shadow: var(--sc-shadow-xl);
+    border: 1px solid var(--sc-border-color);
+    z-index: var(--sc-z-toast);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--sc-transition-normal);
+}
+
+.sc-toast--visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.sc-toast--error {
+    background: var(--sc-color-danger);
+    border-color: var(--sc-color-danger-light);
+    color: white;
+}
+
+.sc-toast--success {
+    background: var(--sc-color-success);
+    border-color: var(--sc-color-success-light);
+    color: white;
+}
+
+/* ============================================
+   Overlay Component
+   ============================================ */
+
+.sc-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: var(--sc-z-modal-backdrop);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--sc-transition-normal);
+}
+
+.sc-overlay--active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ============================================
+   Visibility Helpers
+   ============================================ */
+
+.sc-hidden {
+    display: none !important;
+}
+
+.sc-visible {
+    display: block !important;
+}
+
+.sc-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

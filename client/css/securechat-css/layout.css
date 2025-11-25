@@ -1,0 +1,19 @@
+/* ============================================
+   SecureChat - Layout Structure
+   ============================================ */
+
+.sc-app {
+    height: 100vh;
+    height: calc(var(--sc-vh, 1vh) * 100);
+    display: flex;
+    flex-direction: column;
+    background: var(--sc-bg-primary);
+    position: relative;
+}
+
+.sc-main {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    overflow: hidden;
+}

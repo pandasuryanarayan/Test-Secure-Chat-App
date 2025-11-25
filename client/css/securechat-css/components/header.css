@@ -1,0 +1,66 @@
+/* ============================================
+   SecureChat - Mobile Header Component
+   ============================================ */
+
+.sc-mobile-header {
+    display: none;
+    height: var(--sc-mobile-header-height);
+    background: var(--sc-bg-secondary);
+    border-bottom: 1px solid var(--sc-border-color);
+    padding: 0 var(--sc-space-4);
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    position: relative;
+    z-index: var(--sc-z-sticky);
+}
+
+.sc-mobile-header__menu-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--sc-radius-full);
+    background: linear-gradient(135deg, var(--sc-color-primary) 0%, var(--sc-color-primary-dark) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--sc-transition-fast), box-shadow var(--sc-transition-fast);
+    box-shadow: var(--sc-shadow-md);
+}
+
+.sc-mobile-header__menu-btn:hover {
+    transform: scale(1.05);
+    box-shadow: var(--sc-shadow-glow);
+}
+
+.sc-mobile-header__menu-btn:active {
+    transform: scale(0.95);
+}
+
+.sc-mobile-header__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--sc-space-2);
+}
+
+.sc-mobile-header__logo {
+    color: var(--sc-color-primary);
+    display: flex;
+    align-items: center;
+}
+
+.sc-mobile-header__title {
+    font-size: var(--sc-text-md);
+    font-weight: var(--sc-font-semibold);
+    color: var(--sc-text-primary);
+    letter-spacing: -0.02em;
+}
+
+.sc-mobile-header__status {
+    font-size: var(--sc-text-sm);
+    color: var(--sc-text-secondary);
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

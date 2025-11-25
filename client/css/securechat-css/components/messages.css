@@ -1,0 +1,113 @@
+/* ============================================
+   SecureChat - Messages Component
+   ============================================ */
+
+.sc-message {
+    display: flex;
+    margin-bottom: var(--sc-space-4);
+    animation: sc-message-fade-in 0.3s ease;
+}
+
+.sc-message--sent {
+    justify-content: flex-end;
+}
+
+.sc-message--received {
+    justify-content: flex-start;
+}
+
+.sc-message__bubble {
+    max-width: 70%;
+    padding: var(--sc-space-3) var(--sc-space-4);
+    border-radius: var(--sc-radius-xl);
+    word-break: break-word;
+    position: relative;
+}
+
+.sc-message--sent .sc-message__bubble {
+    background: var(--sc-bg-message-sent);
+    color: white;
+    border-bottom-right-radius: var(--sc-radius-sm);
+    box-shadow: var(--sc-shadow-md);
+}
+
+.sc-message--received .sc-message__bubble {
+    background: var(--sc-bg-message-received);
+    color: var(--sc-text-primary);
+    border: 1px solid var(--sc-bg-message-received-border);
+    border-bottom-left-radius: var(--sc-radius-sm);
+}
+
+.sc-message__sender {
+    font-size: var(--sc-text-xs);
+    font-weight: var(--sc-font-semibold);
+    color: var(--sc-color-accent);
+    margin-bottom: var(--sc-space-1);
+    letter-spacing: 0.02em;
+}
+
+.sc-message__text {
+    font-size: var(--sc-text-base);
+    line-height: var(--sc-leading-relaxed);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.sc-message__time {
+    font-size: var(--sc-text-xs);
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: var(--sc-space-1);
+    text-align: right;
+}
+
+.sc-message--received .sc-message__time {
+    color: var(--sc-text-muted);
+}
+
+/* ============================================
+   Image Messages
+   ============================================ */
+
+.sc-message__image-wrapper {
+    position: relative;
+    border-radius: var(--sc-radius-lg);
+    overflow: hidden;
+}
+
+.sc-message__image {
+    max-width: 300px;
+    max-height: 300px;
+    min-width: 200px;
+    min-height: 150px;
+    border-radius: var(--sc-radius-lg);
+    object-fit: cover;
+    cursor: pointer;
+    display: block;
+    transition: transform var(--sc-transition-fast);
+}
+
+.sc-message__image:hover {
+    transform: scale(1.02);
+}
+
+.sc-message__image.loading {
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.05) 25%, 
+        rgba(255, 255, 255, 0.1) 50%, 
+        rgba(255, 255, 255, 0.05) 75%
+    );
+    background-size: 200% 100%;
+    animation: sc-loading-shimmer 1.5s infinite;
+}
+
+.sc-message__time-overlay {
+    position: absolute;
+    bottom: var(--sc-space-2);
+    right: var(--sc-space-2);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: var(--sc-text-xs);
+    padding: var(--sc-space-1) var(--sc-space-2);
+    border-radius: var(--sc-radius-md);
+    backdrop-filter: blur(8px);
+}

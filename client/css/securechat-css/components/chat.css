@@ -1,0 +1,208 @@
+/* ============================================
+   SecureChat - Chat Area Component
+   ============================================ */
+
+.sc-chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--sc-bg-primary);
+    min-width: 0;
+    position: relative;
+}
+
+/* ============================================
+   Chat Header
+   ============================================ */
+
+.sc-chat__header {
+    height: var(--sc-header-height);
+    padding: 0 var(--sc-space-5);
+    background: var(--sc-bg-secondary);
+    border-bottom: 1px solid var(--sc-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.sc-chat__user {
+    display: flex;
+    align-items: center;
+    gap: var(--sc-space-3);
+}
+
+.sc-chat__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--sc-radius-full);
+    background: var(--sc-bg-elevated);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sc-text-muted);
+}
+
+.sc-chat__user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.sc-chat__user-name {
+    font-size: var(--sc-text-md);
+    font-weight: var(--sc-font-semibold);
+    color: var(--sc-text-primary);
+}
+
+.sc-chat__user-status {
+    font-size: var(--sc-text-sm);
+    color: var(--sc-text-secondary);
+}
+
+.sc-chat__user-status--online {
+    color: var(--sc-color-online);
+}
+
+.sc-chat__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--sc-space-2);
+}
+
+.sc-encryption-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--sc-space-2);
+    padding: var(--sc-space-2) var(--sc-space-3);
+    background: rgba(0, 180, 216, 0.1);
+    border: 1px solid rgba(0, 180, 216, 0.2);
+    border-radius: var(--sc-radius-full);
+    color: var(--sc-color-primary);
+    font-size: var(--sc-text-sm);
+    font-weight: var(--sc-font-medium);
+}
+
+/* ============================================
+   Messages Container
+   ============================================ */
+
+.sc-chat__messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--sc-space-4);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* ============================================
+   Welcome Screen
+   ============================================ */
+
+.sc-welcome {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--sc-space-8);
+}
+
+.sc-welcome__icon {
+    width: 100px;
+    height: 100px;
+    border-radius: var(--sc-radius-full);
+    background: linear-gradient(135deg, rgba(0, 180, 216, 0.1) 0%, rgba(0, 180, 216, 0.05) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--sc-space-6);
+    color: var(--sc-color-primary);
+    animation: sc-pulse-glow 3s infinite ease-in-out;
+}
+
+.sc-welcome__title {
+    font-size: var(--sc-text-2xl);
+    font-weight: var(--sc-font-semibold);
+    color: var(--sc-text-primary);
+    margin-bottom: var(--sc-space-2);
+}
+
+.sc-welcome__subtitle {
+    font-size: var(--sc-text-md);
+    color: var(--sc-color-success);
+    margin-bottom: var(--sc-space-2);
+}
+
+.sc-welcome__description {
+    font-size: var(--sc-text-base);
+    color: var(--sc-text-muted);
+    margin-bottom: var(--sc-space-6);
+    max-width: 320px;
+}
+
+/* Mini welcome screen for chat start */
+.sc-welcome--mini {
+    padding: var(--sc-space-8);
+}
+
+.sc-welcome--mini .sc-welcome__icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: var(--sc-space-4);
+}
+
+.sc-welcome--mini .sc-welcome__description {
+    margin-bottom: 0;
+}
+
+/* ============================================
+   Chat Footer
+   ============================================ */
+
+.sc-chat__footer {
+    padding: var(--sc-space-4);
+    background: var(--sc-bg-secondary);
+    border-top: 1px solid var(--sc-border-color);
+    flex-shrink: 0;
+    position: relative;
+}
+
+/* ============================================
+   Typing Indicator
+   ============================================ */
+
+.sc-typing {
+    display: none;
+    align-items: center;
+    gap: var(--sc-space-2);
+    padding: var(--sc-space-2) var(--sc-space-4);
+    color: var(--sc-text-secondary);
+    font-size: var(--sc-text-sm);
+}
+
+.sc-typing--visible {
+    display: flex;
+}
+
+.sc-typing__dots {
+    display: flex;
+    gap: 4px;
+}
+
+.sc-typing__dots span {
+    width: 6px;
+    height: 6px;
+    background: var(--sc-text-muted);
+    border-radius: var(--sc-radius-full);
+    animation: sc-typing-dot 1.4s infinite ease-in-out;
+}
+
+.sc-typing__dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.sc-typing__dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}

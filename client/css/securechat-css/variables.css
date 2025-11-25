@@ -1,0 +1,131 @@
+/* ============================================
+   SecureChat - CSS Variables (Design Tokens)
+   ============================================ */
+
+:root {
+    /* === Color Palette === */
+    /* Primary Colors */
+    --sc-color-primary: #00b4d8;
+    --sc-color-primary-light: #48cae4;
+    --sc-color-primary-dark: #0096c7;
+    --sc-color-primary-glow: rgba(0, 180, 216, 0.4);
+    
+    /* Accent Colors */
+    --sc-color-accent: #06d6a0;
+    --sc-color-accent-light: #37efba;
+    --sc-color-accent-dark: #05a67a;
+    
+    /* Background Colors */
+    --sc-bg-primary: #0a0e14;
+    --sc-bg-secondary: #0f1419;
+    --sc-bg-tertiary: #151b23;
+    --sc-bg-elevated: #1a212b;
+    --sc-bg-hover: #1f2833;
+    --sc-bg-active: #252f3d;
+    
+    /* Message Backgrounds */
+    --sc-bg-message-sent: linear-gradient(135deg, #0077b6 0%, #005f8c 100%);
+    --sc-bg-message-received: #1a212b;
+    --sc-bg-message-received-border: #2a3441;
+    
+    /* Text Colors */
+    --sc-text-primary: #e6edf3;
+    --sc-text-secondary: #8b949e;
+    --sc-text-muted: #6e7681;
+    --sc-text-hint: #484f58;
+    --sc-text-inverse: #0a0e14;
+    
+    /* Status Colors */
+    --sc-color-success: #10b981;
+    --sc-color-success-light: #34d399;
+    --sc-color-warning: #f59e0b;
+    --sc-color-danger: #ef4444;
+    --sc-color-danger-light: #f87171;
+    --sc-color-online: #10b981;
+    --sc-color-offline: #6b7280;
+    
+    /* Border Colors */
+    --sc-border-color: #21262d;
+    --sc-border-color-light: #30363d;
+    --sc-border-color-focus: var(--sc-color-primary);
+    
+    /* === Typography === */
+    --sc-font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    --sc-font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    
+    /* Font Sizes */
+    --sc-text-xs: 0.75rem;      /* 12px */
+    --sc-text-sm: 0.8125rem;    /* 13px */
+    --sc-text-base: 0.9375rem;  /* 15px */
+    --sc-text-md: 1rem;         /* 16px */
+    --sc-text-lg: 1.125rem;     /* 18px */
+    --sc-text-xl: 1.25rem;      /* 20px */
+    --sc-text-2xl: 1.5rem;      /* 24px */
+    --sc-text-3xl: 1.875rem;    /* 30px */
+    
+    /* Font Weights */
+    --sc-font-light: 300;
+    --sc-font-normal: 400;
+    --sc-font-medium: 500;
+    --sc-font-semibold: 600;
+    --sc-font-bold: 700;
+    
+    /* Line Heights */
+    --sc-leading-tight: 1.25;
+    --sc-leading-normal: 1.5;
+    --sc-leading-relaxed: 1.625;
+    
+    /* === Spacing === */
+    --sc-space-1: 0.25rem;   /* 4px */
+    --sc-space-2: 0.5rem;    /* 8px */
+    --sc-space-3: 0.75rem;   /* 12px */
+    --sc-space-4: 1rem;      /* 16px */
+    --sc-space-5: 1.25rem;   /* 20px */
+    --sc-space-6: 1.5rem;    /* 24px */
+    --sc-space-8: 2rem;      /* 32px */
+    --sc-space-10: 2.5rem;   /* 40px */
+    --sc-space-12: 3rem;     /* 48px */
+    
+    /* === Layout === */
+    --sc-sidebar-width: 320px;
+    --sc-header-height: 64px;
+    --sc-mobile-header-height: 56px;
+    --sc-input-min-height: 48px;
+    --sc-input-max-height: 120px;
+    
+    /* === Borders === */
+    --sc-radius-sm: 0.375rem;   /* 6px */
+    --sc-radius-md: 0.5rem;     /* 8px */
+    --sc-radius-lg: 0.75rem;    /* 12px */
+    --sc-radius-xl: 1rem;       /* 16px */
+    --sc-radius-2xl: 1.5rem;    /* 24px */
+    --sc-radius-full: 9999px;
+    
+    /* === Shadows === */
+    --sc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --sc-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --sc-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+    --sc-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+    --sc-shadow-glow: 0 0 20px var(--sc-color-primary-glow);
+    --sc-shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    
+    /* === Transitions === */
+    --sc-transition-fast: 150ms ease;
+    --sc-transition-normal: 250ms ease;
+    --sc-transition-slow: 350ms ease;
+    --sc-transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* === Z-Index Scale === */
+    --sc-z-base: 1;
+    --sc-z-dropdown: 100;
+    --sc-z-sticky: 200;
+    --sc-z-fixed: 300;
+    --sc-z-modal-backdrop: 400;
+    --sc-z-modal: 500;
+    --sc-z-popover: 600;
+    --sc-z-tooltip: 700;
+    --sc-z-toast: 800;
+    
+    /* === Viewport Height (set by JS) === */
+    --sc-vh: 1vh;
+}

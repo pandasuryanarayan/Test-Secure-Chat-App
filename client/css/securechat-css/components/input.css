@@ -1,0 +1,121 @@
+/* ============================================
+   SecureChat - Input Area Component
+   ============================================ */
+
+.sc-input-area {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--sc-space-2);
+}
+
+.sc-input-area__wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.sc-input-area__textarea {
+    width: 100%;
+    padding: var(--sc-space-3) var(--sc-space-4);
+    background: var(--sc-bg-primary);
+    border: 1px solid var(--sc-border-color);
+    border-radius: var(--sc-radius-2xl);
+    color: var(--sc-text-primary);
+    font-size: var(--sc-text-md);
+    line-height: var(--sc-leading-relaxed);
+    resize: none;
+    min-height: var(--sc-input-min-height);
+    max-height: var(--sc-input-max-height);
+    overflow-y: auto;
+    transition: border-color var(--sc-transition-fast), box-shadow var(--sc-transition-fast);
+}
+
+.sc-input-area__textarea:focus {
+    border-color: var(--sc-color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.15);
+}
+
+.sc-input-area__textarea:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--sc-bg-tertiary);
+}
+
+.sc-input-area__textarea::placeholder {
+    color: var(--sc-text-hint);
+}
+
+/* ============================================
+   Input Buttons
+   ============================================ */
+
+.sc-input-area__attach-btn,
+.sc-input-area__emoji-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--sc-radius-full);
+    color: var(--sc-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--sc-transition-fast);
+    flex-shrink: 0;
+}
+
+.sc-input-area__attach-btn:hover:not(:disabled),
+.sc-input-area__emoji-btn:hover:not(:disabled) {
+    background: var(--sc-bg-hover);
+    color: var(--sc-text-primary);
+}
+
+.sc-input-area__attach-btn:disabled,
+.sc-input-area__emoji-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.sc-input-area__emoji-btn--active {
+    color: var(--sc-color-primary);
+    background: var(--sc-bg-hover);
+}
+
+/* ============================================
+   Send Button
+   ============================================ */
+
+.sc-input-area__send-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--sc-radius-full);
+    background: linear-gradient(135deg, var(--sc-color-primary) 0%, var(--sc-color-primary-dark) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--sc-transition-fast);
+    flex-shrink: 0;
+    box-shadow: var(--sc-shadow-md);
+}
+
+.sc-input-area__send-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: var(--sc-shadow-glow);
+}
+
+.sc-input-area__send-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.sc-input-area__send-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: var(--sc-bg-elevated);
+    box-shadow: none;
+}
+
+/* ============================================
+   File Input (Hidden)
+   ============================================ */
+
+.sc-input-area__file {
+    display: none;
+}

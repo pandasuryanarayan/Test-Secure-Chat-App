@@ -1,0 +1,103 @@
+/* ============================================
+   SecureChat - Buttons Component
+   ============================================ */
+
+.sc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sc-space-2);
+    padding: var(--sc-space-3) var(--sc-space-4);
+    font-size: var(--sc-text-base);
+    font-weight: var(--sc-font-medium);
+    border-radius: var(--sc-radius-lg);
+    transition: all var(--sc-transition-fast);
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+/* ============================================
+   Primary Button
+   ============================================ */
+
+.sc-btn--primary {
+    background: linear-gradient(135deg, var(--sc-color-primary) 0%, var(--sc-color-primary-dark) 100%);
+    color: white;
+    box-shadow: var(--sc-shadow-sm);
+}
+
+.sc-btn--primary:hover {
+    box-shadow: var(--sc-shadow-glow);
+    transform: translateY(-1px);
+}
+
+.sc-btn--primary:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+   Secondary Button
+   ============================================ */
+
+.sc-btn--secondary {
+    background: var(--sc-bg-elevated);
+    color: var(--sc-text-primary);
+    border: 1px solid var(--sc-border-color-light);
+}
+
+.sc-btn--secondary:hover {
+    background: var(--sc-bg-hover);
+    border-color: var(--sc-color-primary);
+}
+
+/* ============================================
+   Danger Button
+   ============================================ */
+
+.sc-btn--danger {
+    background: transparent;
+    color: var(--sc-color-danger);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.sc-btn--danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--sc-color-danger);
+}
+
+/* ============================================
+   Size Variants
+   ============================================ */
+
+.sc-btn--sm {
+    padding: var(--sc-space-2) var(--sc-space-3);
+    font-size: var(--sc-text-sm);
+}
+
+.sc-btn--lg {
+    padding: var(--sc-space-4) var(--sc-space-6);
+    font-size: var(--sc-text-md);
+}
+
+/* ============================================
+   Block Button
+   ============================================ */
+
+.sc-btn--block {
+    width: 100%;
+}
+
+/* ============================================
+   Button States
+   ============================================ */
+
+.sc-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.sc-btn:focus-visible {
+    outline: 2px solid var(--sc-color-primary);
+    outline-offset: 2px;
+}

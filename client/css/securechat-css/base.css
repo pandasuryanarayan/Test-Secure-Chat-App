@@ -1,0 +1,83 @@
+/* ============================================
+   SecureChat - Base Styles & Reset
+   ============================================ */
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: var(--sc-font-primary);
+    font-size: var(--sc-text-base);
+    font-weight: var(--sc-font-normal);
+    line-height: var(--sc-leading-normal);
+    color: var(--sc-text-primary);
+    background: var(--sc-bg-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Remove default button styles */
+button {
+    font-family: inherit;
+    font-size: inherit;
+    border: none;
+    background: none;
+    cursor: pointer;
+    outline: none;
+}
+
+/* Remove default input styles */
+input, textarea {
+    font-family: inherit;
+    font-size: inherit;
+    border: none;
+    outline: none;
+    background: none;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--sc-border-color-light);
+    border-radius: var(--sc-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--sc-text-muted);
+}
+
+/* Selection */
+::selection {
+    background: rgba(0, 180, 216, 0.3);
+    color: var(--sc-text-primary);
+}
+
+/* Focus Visible */
+:focus-visible {
+    outline: 2px solid var(--sc-color-primary);
+    outline-offset: 2px;
+}
