@@ -1,25 +1,39 @@
 /* ============================================
-   SecureChat - Emoji Picker Component
+   SecureChat - Modern Emoji Picker Component
    ============================================ */
 
 .sc-emoji-picker {
     position: absolute;
-    bottom: calc(100% + var(--sc-space-2));
-    left: var(--sc-space-4);
+    bottom: calc(100% + var(--sc-space-3));
+    right: var(--sc-space-4);
     z-index: var(--sc-z-popover);
     display: none;
-    border-radius: var(--sc-radius-lg);
+    border-radius: var(--sc-radius-xl);
     overflow: hidden;
-    box-shadow: var(--sc-shadow-xl);
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.5),
+        0 0 0 1px var(--sc-border-color);
+    transform-origin: bottom right;
 }
 
 .sc-emoji-picker--active {
     display: block;
-    animation: sc-slide-up 0.2s ease;
+    animation: sc-emoji-picker-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes sc-emoji-picker-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 /* ============================================
-   Emoji Picker Element Styles
+   Emoji Picker Element Styling
    ============================================ */
 
 emoji-picker {
@@ -33,11 +47,19 @@ emoji-picker {
     --category-font-color: var(--sc-text-secondary);
     --button-active-background: var(--sc-bg-hover);
     --button-hover-background: var(--sc-bg-hover);
-    width: 350px;
+    --emoji-padding: 0.5rem;
+    --emoji-size: 1.4rem;
+    --num-columns: 8;
+    width: 352px;
     height: 400px;
+    border: none;
 }
 
-emoji-picker.emoji-picker-dark {
-    --background: var(--sc-bg-secondary);
-    --border-color: var(--sc-border-color);
+emoji-picker .search-row input {
+    background: var(--sc-bg-primary) !important;
+    border-radius: var(--sc-radius-lg) !important;
+}
+
+emoji-picker .emoji:hover {
+    background: rgba(0, 180, 216, 0.1) !important;
 }

@@ -158,15 +158,31 @@
 }
 
 /* ============================================
-   Chat Footer
+   Chat Footer - Modern Style
    ============================================ */
 
 .sc-chat__footer {
     padding: var(--sc-space-4);
-    background: var(--sc-bg-secondary);
+    background: linear-gradient(180deg, var(--sc-bg-secondary) 0%, var(--sc-bg-tertiary) 100%);
     border-top: 1px solid var(--sc-border-color);
     flex-shrink: 0;
     position: relative;
+}
+
+/* Subtle top glow when input is focused */
+.sc-chat__footer:has(.sc-input-area:focus-within)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--sc-color-primary) 50%, 
+        transparent 100%
+    );
+    opacity: 0.5;
 }
 
 /* ============================================

@@ -1,115 +1,257 @@
 /* ============================================
-   SecureChat - Input Area Component
+   SecureChat - Modern Input Area Component
    ============================================ */
 
 .sc-input-area {
     display: flex;
     align-items: flex-end;
     gap: var(--sc-space-2);
+    padding: var(--sc-space-2);
+    background: var(--sc-bg-tertiary);
+    border-radius: var(--sc-radius-2xl);
+    border: 1px solid var(--sc-border-color);
+    transition: all var(--sc-transition-fast);
 }
+
+.sc-input-area:focus-within {
+    border-color: var(--sc-color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1), 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: var(--sc-bg-elevated);
+}
+
+/* ============================================
+   Textarea Wrapper
+   ============================================ */
 
 .sc-input-area__wrapper {
     flex: 1;
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .sc-input-area__textarea {
     width: 100%;
-    padding: var(--sc-space-3) var(--sc-space-4);
-    background: var(--sc-bg-primary);
-    border: 1px solid var(--sc-border-color);
-    border-radius: var(--sc-radius-2xl);
+    padding: var(--sc-space-3) var(--sc-space-2);
+    background: transparent;
+    border: none;
+    outline: none;
     color: var(--sc-text-primary);
+    font-family: var(--sc-font-primary);
     font-size: var(--sc-text-md);
-    line-height: var(--sc-leading-relaxed);
+    line-height: 1.5;
     resize: none;
-    min-height: var(--sc-input-min-height);
+    min-height: 24px;
     max-height: var(--sc-input-max-height);
     overflow-y: auto;
-    transition: border-color var(--sc-transition-fast), box-shadow var(--sc-transition-fast);
+    caret-color: var(--sc-color-primary);
 }
 
-.sc-input-area__textarea:focus {
-    border-color: var(--sc-color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.15);
+.sc-input-area__textarea::placeholder {
+    color: var(--sc-text-hint);
+    transition: color var(--sc-transition-fast);
+}
+
+.sc-input-area:focus-within .sc-input-area__textarea::placeholder {
+    color: var(--sc-text-muted);
 }
 
 .sc-input-area__textarea:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background: var(--sc-bg-tertiary);
 }
 
-.sc-input-area__textarea::placeholder {
-    color: var(--sc-text-hint);
+/* Custom scrollbar for textarea */
+.sc-input-area__textarea::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sc-input-area__textarea::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sc-input-area__textarea::-webkit-scrollbar-thumb {
+    background: var(--sc-border-color-light);
+    border-radius: var(--sc-radius-full);
 }
 
 /* ============================================
-   Input Buttons
+   Action Buttons Container
    ============================================ */
 
-.sc-input-area__attach-btn,
-.sc-input-area__emoji-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: var(--sc-radius-full);
-    color: var(--sc-text-secondary);
+.sc-input-area__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--sc-space-1);
+}
+
+/* ============================================
+   Attach Button (Image)
+   ============================================ */
+
+.sc-input-area__attach-btn {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--sc-radius-lg);
+    color: var(--sc-text-muted);
+    cursor: pointer;
     transition: all var(--sc-transition-fast);
     flex-shrink: 0;
 }
 
-.sc-input-area__attach-btn:hover:not(:disabled),
-.sc-input-area__emoji-btn:hover:not(:disabled) {
-    background: var(--sc-bg-hover);
+.sc-input-area__attach-btn:hover:not(:disabled) {
     color: var(--sc-text-primary);
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.sc-input-area__attach-btn:disabled,
-.sc-input-area__emoji-btn:disabled {
-    opacity: 0.4;
+.sc-input-area__attach-btn:active:not(:disabled) {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.sc-input-area__attach-btn:disabled {
+    opacity: 0.3;
     cursor: not-allowed;
 }
 
-.sc-input-area__emoji-btn--active {
-    color: var(--sc-color-primary);
-    background: var(--sc-bg-hover);
+.sc-input-area__attach-btn .sc-icon {
+    width: 20px;
+    height: 20px;
 }
 
 /* ============================================
-   Send Button
+   Emoji Button - Modern Style
    ============================================ */
 
-.sc-input-area__send-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--sc-radius-full);
-    background: linear-gradient(135deg, var(--sc-color-primary) 0%, var(--sc-color-primary-dark) 100%);
-    color: white;
+.sc-input-area__emoji-btn {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--sc-radius-lg);
+    color: var(--sc-text-muted);
+    cursor: pointer;
     transition: all var(--sc-transition-fast);
     flex-shrink: 0;
-    box-shadow: var(--sc-shadow-md);
+    position: relative;
+}
+
+.sc-input-area__emoji-btn::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: var(--sc-radius-md);
+    background: transparent;
+    transition: all var(--sc-transition-fast);
+}
+
+.sc-input-area__emoji-btn:hover:not(:disabled) {
+    color: #fbbf24;
+}
+
+.sc-input-area__emoji-btn:hover:not(:disabled)::before {
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.sc-input-area__emoji-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.sc-input-area__emoji-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Emoji button active state (picker open) */
+.sc-input-area__emoji-btn--active {
+    color: #fbbf24;
+}
+
+.sc-input-area__emoji-btn--active::before {
+    background: rgba(251, 191, 36, 0.15);
+}
+
+.sc-input-area__emoji-btn .sc-icon {
+    width: 22px;
+    height: 22px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================
+   Send Button - Modern Gradient Style
+   ============================================ */
+
+.sc-input-area__send-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: linear-gradient(135deg, var(--sc-color-primary) 0%, var(--sc-color-primary-dark) 100%);
+    border: none;
+    border-radius: var(--sc-radius-xl);
+    color: white;
+    cursor: pointer;
+    transition: all var(--sc-transition-fast);
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 180, 216, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shine effect */
+.sc-input-area__send-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: left 0.5s ease;
+}
+
+.sc-input-area__send-btn:hover:not(:disabled)::before {
+    left: 100%;
 }
 
 .sc-input-area__send-btn:hover:not(:disabled) {
     transform: scale(1.05);
-    box-shadow: var(--sc-shadow-glow);
+    box-shadow: 0 4px 16px rgba(0, 180, 216, 0.4), 0 0 20px rgba(0, 180, 216, 0.2);
 }
 
 .sc-input-area__send-btn:active:not(:disabled) {
-    transform: scale(0.95);
+    transform: scale(0.98);
 }
 
 .sc-input-area__send-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
     background: var(--sc-bg-elevated);
+    color: var(--sc-text-hint);
     box-shadow: none;
+    cursor: not-allowed;
+}
+
+.sc-input-area__send-btn .sc-icon {
+    width: 20px;
+    height: 20px;
+    margin-left: 2px; /* Optical alignment for send arrow */
 }
 
 /* ============================================

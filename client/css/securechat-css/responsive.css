@@ -1,5 +1,6 @@
 /* ============================================
    SecureChat - Responsive Styles
+   Complete Mobile-First Responsive Design
    ============================================ */
 
 /* ============================================
@@ -14,6 +15,19 @@
     .sc-message__bubble {
         max-width: 75%;
     }
+    
+    .sc-chat__header {
+        padding: 0 var(--sc-space-4);
+    }
+    
+    .sc-welcome__icon {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .sc-welcome__title {
+        font-size: var(--sc-text-xl);
+    }
 }
 
 /* ============================================
@@ -21,18 +35,23 @@
    ============================================ */
 
 @media (max-width: 768px) {
+    /* === Root Variable Overrides === */
     :root {
         --sc-sidebar-width: 100%;
+        --sc-header-height: 56px;
     }
     
+    /* === Mobile Header === */
     .sc-mobile-header {
         display: flex;
     }
     
+    /* === Main Layout === */
     .sc-main {
         height: calc(calc(var(--sc-vh, 1vh) * 100) - var(--sc-mobile-header-height));
     }
     
+    /* === Sidebar === */
     .sc-sidebar {
         position: fixed;
         top: 0;
@@ -49,9 +68,23 @@
     
     .sc-sidebar__close-btn {
         display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
-    /* Profile Mobile Adjustments */
+    .sc-sidebar__header {
+        padding: var(--sc-space-4);
+    }
+    
+    .sc-sidebar__search {
+        padding: var(--sc-space-3);
+    }
+    
+    .sc-sidebar__footer {
+        padding: var(--sc-space-3);
+    }
+    
+    /* === Profile Section === */
     .sc-profile__copy-text {
         display: none;
     }
@@ -75,10 +108,75 @@
         font-size: var(--sc-text-xs);
     }
     
-    /* Welcome Screen Mobile */
+    /* === Search === */
+    .sc-search {
+        gap: var(--sc-space-2);
+    }
+    
+    .sc-search__input {
+        padding: var(--sc-space-2) var(--sc-space-2) var(--sc-space-2) calc(var(--sc-space-2) * 3);
+        font-size: var(--sc-text-sm);
+    }
+    
+    .sc-search__icon {
+        left: var(--sc-space-2);
+    }
+    
+    /* === Contacts === */
+    .sc-contact {
+        padding: var(--sc-space-3) var(--sc-space-4);
+    }
+    
+    .sc-contact__avatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .sc-contact__name {
+        font-size: var(--sc-text-sm);
+    }
+    
+    .sc-contact__preview {
+        font-size: var(--sc-text-xs);
+    }
+    
+    /* === Chat Header === */
+    .sc-chat__header {
+        padding: 0 var(--sc-space-4);
+        height: var(--sc-mobile-header-height);
+    }
+    
+    .sc-chat__avatar {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .sc-chat__user-name {
+        font-size: var(--sc-text-base);
+    }
+    
+    .sc-chat__user-status {
+        font-size: var(--sc-text-xs);
+    }
+    
+    .sc-encryption-indicator {
+        display: none;
+    }
+    
+    /* === Welcome Screen === */
+    .sc-welcome {
+        padding: var(--sc-space-6);
+    }
+    
     .sc-welcome__icon {
         width: 80px;
         height: 80px;
+        margin-bottom: var(--sc-space-4);
+    }
+    
+    .sc-welcome__icon .sc-icon {
+        width: 40px;
+        height: 40px;
     }
     
     .sc-welcome__title {
@@ -91,12 +189,43 @@
     
     .sc-welcome__description {
         font-size: var(--sc-text-sm);
+        margin-bottom: var(--sc-space-4);
     }
     
-    /* Messages Mobile */
+    .sc-welcome--mini {
+        padding: var(--sc-space-6);
+    }
+    
+    .sc-welcome--mini .sc-welcome__icon {
+        width: 50px;
+        height: 50px;
+        margin-bottom: var(--sc-space-3);
+    }
+    
+    /* === Messages === */
+    .sc-chat__messages {
+        padding: var(--sc-space-3);
+    }
+    
+    .sc-message {
+        margin-bottom: var(--sc-space-3);
+    }
+    
     .sc-message__bubble {
         max-width: 85%;
         padding: var(--sc-space-3);
+    }
+    
+    .sc-message__text {
+        font-size: var(--sc-text-sm);
+    }
+    
+    .sc-message__time {
+        font-size: 10px;
+    }
+    
+    .sc-message__sender {
+        font-size: 11px;
     }
     
     .sc-message__image {
@@ -106,49 +235,116 @@
         min-height: 130px;
     }
     
-    /* Chat Header Mobile */
-    .sc-encryption-indicator {
-        display: none;
+    .sc-message__time-overlay {
+        font-size: 10px;
+        padding: 2px 6px;
     }
     
-    .sc-chat__header {
-        padding: 0 var(--sc-space-4);
-        height: var(--sc-mobile-header-height);
+    /* === Typing Indicator === */
+    .sc-typing {
+        padding: var(--sc-space-2) var(--sc-space-3);
+        font-size: var(--sc-text-xs);
     }
     
-    /* Chat Footer Mobile */
+    /* === Chat Footer / Input Area === */
     .sc-chat__footer {
         padding: var(--sc-space-3);
     }
     
-    /* Input Area Mobile */
+    .sc-input-area {
+        padding: var(--sc-space-1) var(--sc-space-2);
+        gap: var(--sc-space-1);
+        border-radius: var(--sc-radius-xl);
+    }
+    
     .sc-input-area__textarea {
         font-size: var(--sc-text-base);
-        max-height: 100px;
+        padding: var(--sc-space-2);
+        min-height: 20px;
     }
     
     .sc-input-area__attach-btn,
     .sc-input-area__emoji-btn {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
+    }
+    
+    .sc-input-area__attach-btn .sc-icon,
+    .sc-input-area__emoji-btn .sc-icon {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .sc-input-area__emoji-btn::before {
+        inset: 3px;
     }
     
     .sc-input-area__send-btn {
-        width: 44px;
-        height: 44px;
+        width: 40px;
+        height: 40px;
+        border-radius: var(--sc-radius-lg);
     }
     
-    /* Emoji Picker Mobile */
+    .sc-input-area__send-btn .sc-icon {
+        width: 18px;
+        height: 18px;
+    }
+    
+    /* === Emoji Picker === */
     .sc-emoji-picker {
-        left: var(--sc-space-2);
         right: var(--sc-space-2);
+        left: var(--sc-space-2);
+        bottom: calc(100% + var(--sc-space-2));
         max-width: calc(100vw - var(--sc-space-4));
     }
     
     emoji-picker {
-        width: 100%;
-        max-width: 350px;
-        height: 350px;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 320px;
+        --num-columns: 7;
+        --emoji-size: 1.3rem;
+        --emoji-padding: 0.4rem;
+    }
+    
+    /* === Buttons === */
+    .sc-btn {
+        padding: var(--sc-space-2) var(--sc-space-3);
+        font-size: var(--sc-text-sm);
+    }
+    
+    .sc-btn--lg {
+        padding: var(--sc-space-3) var(--sc-space-4);
+    }
+    
+    /* === Toast === */
+    .sc-toast {
+        left: var(--sc-space-4);
+        right: var(--sc-space-4);
+        transform: translateY(100px);
+        max-width: none;
+        text-align: center;
+    }
+    
+    .sc-toast--visible {
+        transform: translateY(0);
+    }
+    
+    /* === Modal === */
+    .sc-modal__content {
+        margin: var(--sc-space-4);
+    }
+    
+    .sc-modal__close {
+        top: var(--sc-space-2);
+        right: var(--sc-space-2);
+        width: 36px;
+        height: 36px;
+    }
+    
+    .sc-modal__image {
+        max-width: calc(100vw - var(--sc-space-8));
+        max-height: calc(100vh - var(--sc-space-8));
     }
 }
 
@@ -157,8 +353,18 @@
    ============================================ */
 
 @media (max-width: 480px) {
+    /* === Sidebar === */
     .sc-sidebar {
         width: 100%;
+    }
+    
+    .sc-sidebar__header {
+        padding: var(--sc-space-4) var(--sc-space-3);
+    }
+    
+    /* === Mobile Header === */
+    .sc-mobile-header {
+        padding: 0 var(--sc-space-3);
     }
     
     .sc-mobile-header__title {
@@ -170,9 +376,28 @@
         height: 36px;
     }
     
+    .sc-mobile-header__menu-btn .sc-icon {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .sc-mobile-header__status {
+        font-size: var(--sc-text-xs);
+        max-width: 80px;
+    }
+    
+    /* === Profile === */
+    .sc-profile {
+        gap: var(--sc-space-2);
+    }
+    
     .sc-profile__avatar {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
+    }
+    
+    .sc-profile__name {
+        font-size: var(--sc-text-sm);
     }
     
     .sc-profile__copy-btn {
@@ -185,31 +410,145 @@
         height: 12px;
     }
     
+    /* === Chat Header === */
+    .sc-chat__header {
+        padding: 0 var(--sc-space-3);
+        gap: var(--sc-space-2);
+    }
+    
     .sc-chat__avatar {
-        width: 36px;
-        height: 36px;
+        width: 32px;
+        height: 32px;
+    }
+    
+    .sc-chat__user {
+        gap: var(--sc-space-2);
     }
     
     .sc-chat__user-name {
-        font-size: var(--sc-text-base);
+        font-size: var(--sc-text-sm);
     }
     
-    .sc-input-area__textarea {
-        max-height: 80px;
+    /* === Welcome Screen === */
+    .sc-welcome {
+        padding: var(--sc-space-4);
     }
     
-    .sc-input-area__send-btn {
-        width: 40px;
-        height: 40px;
+    .sc-welcome__icon {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .sc-welcome__title {
+        font-size: var(--sc-text-lg);
+    }
+    
+    .sc-welcome__subtitle {
+        font-size: var(--sc-text-sm);
+    }
+    
+    .sc-welcome__description {
+        font-size: var(--sc-text-xs);
+    }
+    
+    /* === Messages === */
+    .sc-chat__messages {
+        padding: var(--sc-space-2);
+    }
+    
+    .sc-message__bubble {
+        max-width: 88%;
+        padding: var(--sc-space-2) var(--sc-space-3);
     }
     
     .sc-message__image {
         max-width: 220px;
         max-height: 220px;
+        min-width: 160px;
+        min-height: 120px;
     }
     
+    /* === Input Area === */
+    .sc-chat__footer {
+        padding: var(--sc-space-2);
+    }
+    
+    .sc-input-area {
+        padding: var(--sc-space-1);
+        gap: var(--sc-space-1);
+        border-radius: var(--sc-radius-lg);
+    }
+    
+    .sc-input-area__textarea {
+        font-size: var(--sc-text-sm);
+        padding: var(--sc-space-2) var(--sc-space-1);
+    }
+    
+    .sc-input-area__attach-btn,
+    .sc-input-area__emoji-btn {
+        width: 34px;
+        height: 34px;
+    }
+    
+    .sc-input-area__attach-btn .sc-icon,
+    .sc-input-area__emoji-btn .sc-icon {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .sc-input-area__send-btn {
+        width: 38px;
+        height: 38px;
+    }
+    
+    .sc-input-area__send-btn .sc-icon {
+        width: 16px;
+        height: 16px;
+    }
+    
+    /* === Emoji Picker === */
     emoji-picker {
-        height: 320px;
+        height: 280px;
+        --num-columns: 6;
+        --emoji-size: 1.2rem;
+        --emoji-padding: 0.35rem;
+    }
+    
+    /* === Security Badge === */
+    .sc-security-badge {
+        font-size: var(--sc-text-xs);
+        padding: var(--sc-space-1) var(--sc-space-2);
+    }
+    
+    .sc-security-badge .sc-icon {
+        width: 14px;
+        height: 14px;
+    }
+    
+    /* === Buttons === */
+    .sc-btn {
+        padding: var(--sc-space-2);
+        font-size: var(--sc-text-xs);
+    }
+    
+    .sc-btn .sc-icon {
+        width: 14px;
+        height: 14px;
+    }
+    
+    /* === Contacts === */
+    .sc-contact {
+        padding: var(--sc-space-3);
+    }
+    
+    .sc-contact__avatar {
+        width: 38px;
+        height: 38px;
+    }
+    
+    .sc-contact__status-dot {
+        width: 10px;
+        height: 10px;
     }
 }
 
@@ -218,6 +557,7 @@
    ============================================ */
 
 @media (max-width: 360px) {
+    /* === Mobile Header === */
     .sc-mobile-header__brand {
         gap: var(--sc-space-1);
     }
@@ -226,59 +566,292 @@
         display: none;
     }
     
-    .sc-btn--sm {
-        padding: var(--sc-space-1) var(--sc-space-2);
-    }
-}
-
-/* ============================================
-   Landscape Mode
-   ============================================ */
-
-@media (max-height: 500px) and (orientation: landscape) {
-    .sc-mobile-header {
-        height: 48px;
+    .sc-mobile-header__title {
+        font-size: var(--sc-text-xs);
     }
     
-    .sc-main {
-        height: calc(calc(var(--sc-vh, 1vh) * 100) - 48px);
+    .sc-mobile-header__menu-btn {
+        width: 34px;
+        height: 34px;
     }
     
-    .sc-chat__header {
-        height: 48px;
+    /* === Profile === */
+    .sc-profile__avatar {
+        width: 32px;
+        height: 32px;
     }
     
-    .sc-chat__messages {
-        padding: var(--sc-space-2);
+    .sc-profile__copy-btn {
+        width: 24px;
+        height: 24px;
     }
     
-    .sc-input-area__textarea {
-        max-height: 60px;
-        min-height: 40px;
+    /* === Chat === */
+    .sc-chat__avatar {
+        width: 30px;
+        height: 30px;
     }
     
+    /* === Input Area === */
+    .sc-input-area__attach-btn,
+    .sc-input-area__emoji-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .sc-input-area__send-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    /* === Welcome === */
     .sc-welcome__icon {
         width: 60px;
         height: 60px;
     }
     
     .sc-welcome__title {
-        font-size: var(--sc-text-lg);
+        font-size: var(--sc-text-md);
+    }
+    
+    /* === Messages === */
+    .sc-message__bubble {
+        max-width: 90%;
+    }
+    
+    .sc-message__image {
+        max-width: 200px;
+        max-height: 200px;
+        min-width: 140px;
+        min-height: 100px;
+    }
+    
+    /* === Buttons === */
+    .sc-btn--sm {
+        padding: var(--sc-space-1) var(--sc-space-2);
+        font-size: 10px;
+    }
+    
+    /* === Emoji Picker === */
+    emoji-picker {
+        height: 260px;
+        --num-columns: 5;
+        --emoji-size: 1.1rem;
     }
 }
 
 /* ============================================
-   High DPI Screens
+   Landscape Mode (Short Height)
+   ============================================ */
+
+@media (max-height: 500px) and (orientation: landscape) {
+    /* === Header === */
+    .sc-mobile-header {
+        height: 48px;
+    }
+    
+    /* === Main === */
+    .sc-main {
+        height: calc(calc(var(--sc-vh, 1vh) * 100) - 48px);
+    }
+    
+    /* === Sidebar === */
+    .sc-sidebar {
+        height: calc(var(--sc-vh, 1vh) * 100);
+    }
+    
+    .sc-sidebar__header {
+        padding: var(--sc-space-2) var(--sc-space-3);
+    }
+    
+    .sc-sidebar__search {
+        padding: var(--sc-space-2);
+    }
+    
+    .sc-sidebar__footer {
+        padding: var(--sc-space-2);
+    }
+    
+    /* === Profile === */
+    .sc-profile__avatar {
+        width: 32px;
+        height: 32px;
+    }
+    
+    /* === Chat Header === */
+    .sc-chat__header {
+        height: 48px;
+        padding: 0 var(--sc-space-3);
+    }
+    
+    /* === Messages === */
+    .sc-chat__messages {
+        padding: var(--sc-space-2);
+    }
+    
+    .sc-message {
+        margin-bottom: var(--sc-space-2);
+    }
+    
+    .sc-message__bubble {
+        padding: var(--sc-space-2);
+    }
+    
+    /* === Input Area === */
+    .sc-chat__footer {
+        padding: var(--sc-space-2);
+    }
+    
+    .sc-input-area__textarea {
+        max-height: 60px;
+        min-height: 20px;
+    }
+    
+    .sc-input-area__attach-btn,
+    .sc-input-area__emoji-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .sc-input-area__send-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    /* === Welcome Screen === */
+    .sc-welcome {
+        padding: var(--sc-space-4);
+    }
+    
+    .sc-welcome__icon {
+        width: 50px;
+        height: 50px;
+        margin-bottom: var(--sc-space-2);
+    }
+    
+    .sc-welcome__title {
+        font-size: var(--sc-text-md);
+        margin-bottom: var(--sc-space-1);
+    }
+    
+    .sc-welcome__subtitle {
+        font-size: var(--sc-text-sm);
+        margin-bottom: var(--sc-space-1);
+    }
+    
+    .sc-welcome__description {
+        font-size: var(--sc-text-xs);
+        margin-bottom: var(--sc-space-2);
+    }
+    
+    .sc-btn--lg {
+        padding: var(--sc-space-2) var(--sc-space-4);
+        font-size: var(--sc-text-sm);
+    }
+    
+    /* === Emoji Picker === */
+    emoji-picker {
+        height: 220px;
+        --num-columns: 8;
+        --emoji-size: 1.1rem;
+    }
+    
+    /* === Contacts === */
+    .sc-contact {
+        padding: var(--sc-space-2) var(--sc-space-3);
+    }
+    
+    .sc-contact__avatar {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* ============================================
+   Large Landscape (Tablet Landscape)
+   ============================================ */
+
+@media (max-height: 600px) and (min-width: 769px) and (orientation: landscape) {
+    .sc-welcome__icon {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .sc-welcome__title {
+        font-size: var(--sc-text-lg);
+    }
+    
+    .sc-input-area__textarea {
+        max-height: 80px;
+    }
+}
+
+/* ============================================
+   High DPI / Retina Screens
    ============================================ */
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     .sc-message__image {
         image-rendering: -webkit-optimize-contrast;
     }
+    
+    .sc-modal__image {
+        image-rendering: -webkit-optimize-contrast;
+    }
 }
 
 /* ============================================
-   Reduced Motion
+   Hover Capable Devices Only
+   ============================================ */
+
+@media (hover: hover) and (pointer: fine) {
+    .sc-contact:hover {
+        background: var(--sc-bg-hover);
+    }
+    
+    .sc-input-area__attach-btn:hover:not(:disabled),
+    .sc-input-area__emoji-btn:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .sc-input-area__send-btn:hover:not(:disabled) {
+        transform: scale(1.05);
+    }
+    
+    .sc-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+    }
+}
+
+/* ============================================
+   Touch Devices (No Hover)
+   ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+    /* Increase touch targets */
+    .sc-contact {
+        min-height: 56px;
+    }
+    
+    .sc-input-area__attach-btn,
+    .sc-input-area__emoji-btn,
+    .sc-input-area__send-btn {
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    /* Remove hover effects that don't work on touch */
+    .sc-input-area__send-btn:hover:not(:disabled) {
+        transform: none;
+    }
+    
+    .sc-btn:hover:not(:disabled) {
+        transform: none;
+    }
+}
+
+/* ============================================
+   Reduced Motion (Accessibility)
    ============================================ */
 
 @media (prefers-reduced-motion: reduce) {
@@ -288,7 +861,36 @@
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
+    
+    .sc-welcome__icon {
+        animation: none;
+    }
+    
+    .sc-typing__dots span {
+        animation: none;
+    }
+    
+    .sc-input-area__send-btn::before {
+        display: none;
+    }
+    
+    .sc-emoji-picker--active {
+        animation: none;
+    }
+}
+
+/* ============================================
+   Dark Mode Preference (if system switches)
+   ============================================ */
+
+@media (prefers-color-scheme: light) {
+    /* 
+     * SecureChat is designed as dark-theme only.
+     * This section is a placeholder if you want to
+     * add light mode support in the future.
+     */
 }
 
 /* ============================================
@@ -299,18 +901,63 @@
     .sc-mobile-header,
     .sc-sidebar,
     .sc-chat__footer,
+    .sc-chat__header,
     .sc-overlay,
     .sc-toast,
-    .sc-modal {
+    .sc-modal,
+    .sc-typing,
+    .sc-emoji-picker,
+    .sc-welcome {
         display: none !important;
+    }
+    
+    .sc-app {
+        height: auto;
+        overflow: visible;
+    }
+    
+    .sc-main {
+        display: block;
+        height: auto;
     }
     
     .sc-chat {
         width: 100%;
+        height: auto;
     }
     
     .sc-chat__messages {
         overflow: visible;
         height: auto;
+        padding: 0;
+    }
+    
+    .sc-message {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    
+    .sc-message__bubble {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        max-width: 100%;
+    }
+    
+    .sc-message--sent .sc-message__bubble {
+        background: #e3f2fd;
+        color: #000;
+    }
+    
+    .sc-message--received .sc-message__bubble {
+        background: #f5f5f5;
+        color: #000;
+    }
+    
+    .sc-message__time {
+        color: #666;
+    }
+    
+    .sc-message__sender {
+        color: #333;
     }
 }
