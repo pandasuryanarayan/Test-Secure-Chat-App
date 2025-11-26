@@ -220,44 +220,54 @@
                 </div>
 
                 <!-- Message Input -->
-                <footer class="sc-chat__footer">
-                    <div class="sc-input-area">
-                        <input type="file" id="imageInput" accept="image/*" class="sc-input-area__file" hidden>
+<footer class="sc-chat__footer">
+    <div class="sc-input-area">
+        <!-- Hidden File Input -->
+        <input type="file" id="imageInput" accept="image/*" class="sc-input-area__file" hidden>
 
-                        <button class="sc-input-area__attach-btn" id="attachImageBtn" title="Send Image" disabled>
-                            <svg class="sc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                <polyline points="21 15 16 10 5 21"></polyline>
-                            </svg>
-                        </button>
+        <!-- Attach Image Button -->
+        <button class="sc-input-area__attach-btn" id="attachImageBtn" title="Send Image" disabled>
+            <svg class="sc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+        </button>
 
-                        <div class="sc-input-area__wrapper">
-                            <textarea id="messageInput" class="sc-input-area__textarea"
-                                placeholder="Type a secure message..." disabled rows="1"></textarea>
-                        </div>
+        <!-- Textarea Wrapper -->
+        <div class="sc-input-area__wrapper">
+            <textarea 
+                id="messageInput" 
+                class="sc-input-area__textarea"
+                placeholder="Type a secure message..." 
+                disabled 
+                rows="1"
+            ></textarea>
+        </div>
 
-                        <button class="sc-input-area__emoji-btn" id="emojiBtn" disabled title="Emojis">
-                            <svg class="sc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-                                <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                                <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                            </svg>
-                        </button>
+        <!-- Emoji Button -->
+        <button class="sc-input-area__emoji-btn" id="emojiBtn" disabled title="Emoji">
+            <svg class="sc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                <circle cx="9" cy="9" r="1" fill="currentColor" stroke="none"></circle>
+                <circle cx="15" cy="9" r="1" fill="currentColor" stroke="none"></circle>
+            </svg>
+        </button>
 
-                        <button class="sc-input-area__send-btn" id="sendBtn" disabled title="Send Message">
-                            <svg class="sc-icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                            </svg>
-                        </button>
-                    </div>
+        <!-- Send Button -->
+        <button class="sc-input-area__send-btn" id="sendBtn" disabled title="Send Message">
+            <svg class="sc-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+        </button>
+    </div>
 
-                    <!-- Emoji Picker Container -->
-                    <div class="sc-emoji-picker" id="emojiPickerContainer">
-                        <!-- Emoji picker will be inserted here -->
-                    </div>
-                </footer>
+    <!-- Emoji Picker Container -->
+    <div class="sc-emoji-picker" id="emojiPickerContainer">
+        <!-- Emoji picker will be inserted here -->
+    </div>
+</footer>
             </main>
         </div>
 
