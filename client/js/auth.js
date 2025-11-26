@@ -1,5 +1,5 @@
-// const API_URL = 'http://localhost:3000/api';
-const API_URL = 'https://test-secure-chat-app.onrender.com/api';
+const API_URL = 'http://localhost:3000/api';
+// const API_URL = 'https://secure-chat-app-8typ.onrender.com/api';
 
 // Password hashing utility using Web Crypto API
 class PasswordHasher {
@@ -45,48 +45,50 @@ class PasswordHasher {
 
 const passwordHasher = new PasswordHasher();
 
-// Tab switching
+// Tab switching with new class names
 function showTab(tab) {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
-    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabBtns = document.querySelectorAll('.sc-auth__tab');
+    
+    tabBtns.forEach(btn => btn.classList.remove('sc-auth__tab--active'));
     
     if (tab === 'login') {
         loginForm.style.display = 'flex';
         registerForm.style.display = 'none';
-        tabBtns[0].classList.add('active');
-        tabBtns[1].classList.remove('active');
+        document.querySelector('[data-tab="login"]').classList.add('sc-auth__tab--active');
     } else {
         loginForm.style.display = 'none';
         registerForm.style.display = 'flex';
-        tabBtns[0].classList.remove('active');
-        tabBtns[1].classList.add('active');
+        document.querySelector('[data-tab="register"]').classList.add('sc-auth__tab--active');
     }
 }
 
-// Show message
+// Show message with new class names
 function showMessage(message, type) {
     const messageDiv = document.getElementById('message');
     messageDiv.textContent = message;
-    messageDiv.className = `message ${type}`;
+    messageDiv.className = 'sc-auth__message';
+    messageDiv.classList.add(type); // 'success' or 'error'
+    
     setTimeout(() => {
-        messageDiv.className = 'message';
+        messageDiv.className = 'sc-auth__message';
     }, 5000);
 }
 
-// Show loading state
+// Loading state with new class names
 function setLoading(formId, isLoading) {
     const form = document.getElementById(formId);
-    const button = form.querySelector('button[type="submit"]');
+    const button = form.querySelector('.sc-btn');
     const inputs = form.querySelectorAll('input');
     
     if (isLoading) {
         button.disabled = true;
-        button.textContent = formId === 'loginForm' ? 'Logging in...' : 'Registering...';
+        button.classList.add('sc-btn--loading');
         inputs.forEach(input => input.disabled = true);
     } else {
         button.disabled = false;
-        button.textContent = formId === 'loginForm' ? 'Login' : 'Register';
+        button.classList.remove('sc-btn--loading');
         inputs.forEach(input => input.disabled = false);
     }
 }
@@ -166,7 +168,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             document.getElementById('loginForm').reset();
             
             setTimeout(() => {
-                window.location.href = '/chat.html';
+                window.location.href = '/client/chat.html';
             }, 1500);
         } else {
             showMessage(data.message || 'Login failed', 'error');
@@ -248,7 +250,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             // Show user ID in a more prominent way
             setTimeout(() => {
                 if (confirm(`Your unique ID is: ${data.userId}\n\nPlease save this ID. You'll need it to share with others.\n\nClick OK to continue to chat.`)) {
-                    window.location.href = '/chat.html';
+                    window.location.href = '/client/chat.html';
                 }
             }, 1000);
         } else {
@@ -262,45 +264,13 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     }
 });
 
-// Password visibility toggle
-function addPasswordToggle() {
-    const passwordInputs = document.querySelectorAll('input[type="password"]');
-    
-    passwordInputs.forEach(input => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'password-wrapper';
-        input.parentNode.insertBefore(wrapper, input);
-        wrapper.appendChild(input);
-        
-        const toggleBtn = document.createElement('button');
-        toggleBtn.type = 'button';
-        toggleBtn.className = 'password-toggle';
-        toggleBtn.innerHTML = '👁️';
-        toggleBtn.onclick = () => {
-            if (input.type === 'password') {
-                input.type = 'text';
-                toggleBtn.innerHTML = '👁️‍🗨️';
-            } else {
-                input.type = 'password';
-                toggleBtn.innerHTML = '👁️';
-            }
-        };
-        wrapper.appendChild(toggleBtn);
-    });
-}
-
 // Check if already logged in
 if (localStorage.getItem('token') && sessionStorage.getItem('sessionActive')) {
     showMessage('Already logged in. Redirecting...', 'success');
     setTimeout(() => {
-        window.location.href = '/chat.html';
+        window.location.href = '/client/chat.html';
     }, 1000);
 }
-
-// Initialize password toggles
-document.addEventListener('DOMContentLoaded', () => {
-    addPasswordToggle();
-});
 
 // Clear session on tab close (optional)
 window.addEventListener('beforeunload', () => {
