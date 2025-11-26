@@ -1,5 +1,5 @@
 // Define the server URL
-const SERVER_URL = 'http://localhost:3000'; // Your Express server URL
+const SERVER_URL = 'https://test-secure-chat-app.onrender.com'; // Your Express server URL
 // const SERVER_URL = 'https://secure-chat-app-8typ.onrender.com';
 const API_URL = `${SERVER_URL}/api`;
 const IS_PRODUCTION = SERVER_URL.includes('onrender.com') || !SERVER_URL.includes('localhost');
@@ -1178,7 +1178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             localStorage.clear();
             socket.disconnect();
-            window.location.href = '/client/login.html';
+            window.location.href = './login.html';
         });
     }
 });
