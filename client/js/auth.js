@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'https://test-secure-chat-app.onrender.com/api';
 // const API_URL = 'https://secure-chat-app-8typ.onrender.com/api';
 
 // Password hashing utility using Web Crypto API
