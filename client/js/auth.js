@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000/api";
+const API_URL = "https://test-secure-chat-app.onrender.com/api";
 // const API_URL = 'https://secure-chat-app-8typ.onrender.com/api';
 
 // Password hashing utility using Web Crypto API
@@ -184,7 +184,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
       document.getElementById("loginForm").reset();
 
       setTimeout(() => {
-        window.location.href = window.location.origin + "/client/chat.html";
+        window.location.href = window.location.origin + "./chat.html";
       }, 1500);
     } else {
       showMessage(data.message || "Login failed", "error");
