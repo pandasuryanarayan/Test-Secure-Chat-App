@@ -1,0 +1,227 @@
+/* ============================================
+   SecureChat Login - Form Component
+   ============================================ */
+
+.sc-auth__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sc-space-5);
+}
+
+/* ============================================
+   Form Group
+   ============================================ */
+
+.sc-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sc-space-2);
+}
+
+.sc-form-label {
+    font-size: var(--sc-text-sm);
+    font-weight: var(--sc-font-medium);
+    color: var(--sc-text-secondary);
+    transition: color var(--sc-transition-fast);
+}
+
+/* ============================================
+   Input Wrapper - Main Container
+   Controls all child transitions
+   ============================================ */
+
+.sc-form-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--sc-bg-input);
+    border: 1px solid var(--sc-border-color);
+    border-radius: var(--sc-radius-lg);
+    overflow: hidden;
+    /* Single transition for all properties */
+    transition: 
+        background-color var(--sc-transition-fast),
+        border-color var(--sc-transition-fast),
+        box-shadow var(--sc-transition-fast);
+}
+
+/* Hover State - All changes happen together */
+.sc-form-input-wrapper:hover {
+    background: var(--sc-bg-secondary);
+    border-color: var(--sc-border-color-light);
+}
+
+/* Focus State - All changes happen together */
+.sc-form-input-wrapper:focus-within {
+    background: var(--sc-bg-secondary);
+    border-color: var(--sc-color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.15);
+}
+
+/* ============================================
+   Left Icon - Synced with wrapper
+   ============================================ */
+
+.sc-form-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+    /* Match parent transition timing */
+    transition: color var(--sc-transition-fast);
+}
+
+.sc-form-icon--left {
+    margin-left: var(--sc-space-4);
+    color: var(--sc-text-muted);
+}
+
+/* Icon changes on wrapper hover */
+.sc-form-input-wrapper:hover .sc-form-icon--left {
+    color: var(--sc-text-secondary);
+}
+
+/* Icon changes on wrapper focus */
+.sc-form-input-wrapper:focus-within .sc-form-icon--left {
+    color: var(--sc-color-primary);
+}
+
+/* ============================================
+   Input Field
+   ============================================ */
+
+.sc-form-input {
+    flex: 1;
+    width: 100%;
+    height: 48px;
+    padding: 0 var(--sc-space-4) 0 var(--sc-space-3);
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: var(--sc-text-primary);
+    font-family: var(--sc-font-primary);
+    font-size: var(--sc-text-base);
+    line-height: 48px;
+    caret-color: var(--sc-color-primary);
+    /* No transition needed - stays transparent */
+}
+
+.sc-form-input::placeholder {
+    color: var(--sc-text-hint);
+    transition: color var(--sc-transition-fast);
+}
+
+/* Placeholder lightens on hover */
+.sc-form-input-wrapper:hover .sc-form-input::placeholder {
+    color: var(--sc-text-muted);
+}
+
+/* Placeholder lightens more on focus */
+.sc-form-input-wrapper:focus-within .sc-form-input::placeholder {
+    color: var(--sc-text-secondary);
+}
+
+/* Password field - less right padding for toggle */
+.sc-form-input--password {
+    padding-right: var(--sc-space-1);
+}
+
+/* ============================================
+   Autofill Fix - Prevent white background
+   ============================================ */
+
+.sc-form-input:-webkit-autofill,
+.sc-form-input:-webkit-autofill:hover,
+.sc-form-input:-webkit-autofill:focus,
+.sc-form-input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--sc-bg-input) inset !important;
+    -webkit-text-fill-color: var(--sc-text-primary) !important;
+    caret-color: var(--sc-color-primary);
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Autofill adapts to hover/focus states */
+.sc-form-input-wrapper:hover .sc-form-input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px var(--sc-bg-secondary) inset !important;
+}
+
+.sc-form-input-wrapper:focus-within .sc-form-input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px var(--sc-bg-secondary) inset !important;
+}
+
+/* ============================================
+   Password Toggle Button
+   ============================================ */
+
+.sc-form-toggle {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-right: var(--sc-space-1);
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--sc-radius-md);
+    color: var(--sc-text-muted);
+    cursor: pointer;
+    /* Match parent transition timing */
+    transition: 
+        color var(--sc-transition-fast),
+        background-color var(--sc-transition-fast);
+}
+
+/* Toggle color syncs with wrapper hover */
+.sc-form-input-wrapper:hover .sc-form-toggle {
+    color: var(--sc-text-secondary);
+}
+
+/* Toggle hover effect */
+.sc-form-toggle:hover {
+    color: var(--sc-text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sc-form-toggle:active {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================
+   Toggle Icons
+   ============================================ */
+
+.sc-form-toggle__icon {
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+}
+
+/* Default: Show eye, hide eye-off */
+.sc-form-toggle__icon--show {
+    display: block;
+}
+
+.sc-form-toggle__icon--hide {
+    display: none;
+}
+
+/* Active state: Hide eye, show eye-off */
+.sc-form-toggle--active .sc-form-toggle__icon--show {
+    display: none;
+}
+
+.sc-form-toggle--active .sc-form-toggle__icon--hide {
+    display: block;
+}
+
+/* ============================================
+   Form Hint Text
+   ============================================ */
+
+.sc-form-hint {
+    font-size: var(--sc-text-xs);
+    color: var(--sc-text-muted);
+    margin-top: var(--sc-space-1);
+    line-height: 1.4;
+}

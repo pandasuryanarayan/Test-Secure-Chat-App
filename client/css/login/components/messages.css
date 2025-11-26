@@ -1,0 +1,45 @@
+/* ============================================
+   SecureChat Login - Messages Component
+   ============================================ */
+
+.sc-auth__message {
+    margin-top: var(--sc-space-5);
+    padding: var(--sc-space-4);
+    border-radius: var(--sc-radius-lg);
+    font-size: var(--sc-text-sm);
+    font-weight: var(--sc-font-medium);
+    text-align: center;
+    display: none;
+    animation: sc-message-slide-in 0.3s ease;
+}
+
+/* === Success Message === */
+.sc-auth__message--success {
+    display: block;
+    background: var(--sc-color-success-bg);
+    color: var(--sc-color-success);
+    border: 1px solid var(--sc-color-success-border);
+}
+
+/* === Error Message === */
+.sc-auth__message--error {
+    display: block;
+    background: var(--sc-color-error-bg);
+    color: var(--sc-color-error);
+    border: 1px solid var(--sc-color-error-border);
+}
+
+/* Legacy class support */
+.sc-auth__message.success {
+    display: block;
+    background: var(--sc-color-success-bg);
+    color: var(--sc-color-success);
+    border: 1px solid var(--sc-color-success-border);
+}
+
+.sc-auth__message.error {
+    display: block;
+    background: var(--sc-color-error-bg);
+    color: var(--sc-color-error);
+    border: 1px solid var(--sc-color-error-border);
+}

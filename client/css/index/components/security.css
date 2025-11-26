@@ -1,0 +1,263 @@
+/* ============================================
+   SecureChat Landing - Security Component
+   ============================================ */
+
+.sc-security {
+    padding: var(--sc-section-padding) 0;
+    background: var(--sc-bg-secondary);
+    width: 100%;
+    overflow: visible;
+}
+
+.sc-security .sc-container {
+    width: 100%;
+    max-width: var(--sc-container-max);
+    padding: 0 24px;
+    margin: 0 auto;
+}
+
+.sc-security__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    width: 100%;
+}
+
+.sc-security-card {
+    background: var(--sc-bg-card);
+    border: 1px solid var(--sc-border);
+    border-radius: var(--sc-radius-xl);
+    padding: 32px;
+    transition: all var(--sc-transition-base);
+    
+    /* Ensure visibility */
+    display: flex;
+    flex-direction: column;
+    visibility: visible;
+    opacity: 1;
+}
+
+.sc-security-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(0, 180, 216, 0.3);
+    box-shadow: var(--sc-shadow-lg);
+}
+
+.sc-security-card__icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 180, 216, 0.1);
+    border-radius: var(--sc-radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: var(--sc-primary);
+    flex-shrink: 0;
+}
+
+.sc-security-card__icon svg {
+    width: 30px;
+    height: 30px;
+}
+
+.sc-security-card__title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--sc-text-primary);
+}
+
+.sc-security-card__text {
+    font-size: 0.95rem;
+    color: var(--sc-text-secondary);
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.sc-security-card__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.sc-security-card__list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(0, 180, 216, 0.05);
+    border-radius: var(--sc-radius-md);
+    font-size: 0.9rem;
+    color: var(--sc-text-secondary);
+}
+
+.sc-security-card__list svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--sc-accent);
+    flex-shrink: 0;
+}
+
+/* ============================================
+   Tablet Responsive
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .sc-security__grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    /* Third card full width on tablet */
+    .sc-security-card:nth-child(3) {
+        grid-column: 1 / -1;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+}
+
+/* ============================================
+   Mobile Responsive - IMPORTANT FIXES
+   ============================================ */
+
+@media (max-width: 768px) {
+    .sc-security {
+        padding: 60px 0;
+        overflow: visible !important;
+    }
+    
+    .sc-security .sc-container {
+        padding: 0 16px;
+    }
+    
+    .sc-security__grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    /* Force visibility for ALL cards on mobile */
+    .sc-security-card {
+        padding: 24px;
+        border-radius: var(--sc-radius-lg);
+        max-width: 100%;
+        width: 100%;
+        margin: 0;
+        
+        /* Force visibility */
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    
+    /* Specifically target the third card */
+    .sc-security-card:nth-child(3) {
+        grid-column: auto;
+        max-width: 100%;
+        margin: 0;
+        
+        /* Force visibility */
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    
+    .sc-security-card__icon {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 16px;
+    }
+    
+    .sc-security-card__icon svg {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .sc-security-card__title {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+    
+    .sc-security-card__text {
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+    }
+    
+    .sc-security-card__list {
+        gap: 8px;
+    }
+    
+    .sc-security-card__list li {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .sc-security-card__list svg {
+        width: 14px;
+        height: 14px;
+    }
+    
+    /* Override AOS on mobile for security cards */
+    .sc-security-card[data-aos] {
+        opacity: 1 !important;
+        transform: none !important;
+        visibility: visible !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .sc-security {
+        padding: 50px 0;
+    }
+    
+    .sc-security .sc-container {
+        padding: 0 12px;
+    }
+    
+    .sc-security__grid {
+        gap: 16px;
+    }
+    
+    .sc-security-card {
+        padding: 20px;
+        border-radius: 12px;
+    }
+    
+    .sc-security-card__title {
+        font-size: 1.1rem;
+    }
+    
+    .sc-security-card__text {
+        font-size: 0.85rem;
+    }
+    
+    .sc-security-card__list li {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 360px) {
+    .sc-security-card {
+        padding: 16px;
+    }
+    
+    .sc-security-card__icon {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .sc-security-card__icon svg {
+        width: 22px;
+        height: 22px;
+    }
+    
+    .sc-security-card__title {
+        font-size: 1rem;
+    }
+}

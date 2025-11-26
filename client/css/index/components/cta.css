@@ -1,0 +1,225 @@
+/* ============================================
+   SecureChat Landing - CTA Component
+   ============================================ */
+
+.sc-cta {
+    padding: var(--sc-section-padding) 0;
+    background: var(--sc-bg-primary);
+    width: 100%;
+    display: block;
+    overflow: visible;
+}
+
+.sc-cta .sc-container {
+    width: 100%;
+    max-width: var(--sc-container-max);
+    padding: 0 24px;
+    margin: 0 auto;
+}
+
+.sc-cta__card {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--sc-gradient-primary);
+    border-radius: var(--sc-radius-xl);
+    padding: 64px 40px;
+    text-align: center;
+    box-shadow: 
+        var(--sc-shadow-xl), 
+        0 0 60px rgba(0, 180, 216, 0.3);
+    
+    /* Ensure visibility */
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    overflow: visible;
+}
+
+/* Glow effect */
+.sc-cta__glow {
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.sc-cta__title {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 12px;
+    line-height: 1.2;
+    
+    /* Ensure visibility */
+    display: block;
+    visibility: visible;
+    opacity: 1;
+}
+
+.sc-cta__text {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 32px;
+    line-height: 1.6;
+    
+    /* Ensure visibility */
+    display: block;
+    visibility: visible;
+    opacity: 1;
+}
+
+.sc-cta__card .sc-btn {
+    position: relative;
+    z-index: 1;
+    
+    /* Ensure visibility */
+    display: inline-flex;
+    visibility: visible;
+    opacity: 1;
+}
+
+/* ============================================
+   Mobile Responsive - IMPORTANT FIXES
+   ============================================ */
+
+@media (max-width: 768px) {
+    .sc-cta {
+        padding: 60px 0;
+        overflow: visible !important;
+    }
+    
+    .sc-cta .sc-container {
+        padding: 0 16px;
+    }
+    
+    .sc-cta__card {
+        padding: 40px 24px;
+        border-radius: var(--sc-radius-lg);
+        max-width: 100%;
+        
+        /* Force visibility on mobile */
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    
+    .sc-cta__glow {
+        width: 300px;
+        height: 300px;
+        top: -30%;
+    }
+    
+    .sc-cta__title {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        
+        /* Force visibility */
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    .sc-cta__text {
+        font-size: 0.95rem;
+        margin-bottom: 24px;
+        
+        /* Force visibility */
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    .sc-cta__card .sc-btn {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+        
+        /* Force visibility */
+        display: inline-flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .sc-cta {
+        padding: 50px 0;
+    }
+    
+    .sc-cta .sc-container {
+        padding: 0 12px;
+    }
+    
+    .sc-cta__card {
+        padding: 32px 20px;
+        border-radius: 16px;
+    }
+    
+    .sc-cta__glow {
+        display: none; /* Hide glow on very small screens */
+    }
+    
+    .sc-cta__title {
+        font-size: 1.35rem;
+    }
+    
+    .sc-cta__text {
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+    
+    .sc-cta__card .sc-btn {
+        padding: 14px 24px;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .sc-cta__card {
+        padding: 28px 16px;
+        border-radius: 12px;
+    }
+    
+    .sc-cta__title {
+        font-size: 1.2rem;
+    }
+    
+    .sc-cta__text {
+        font-size: 0.85rem;
+    }
+    
+    .sc-cta__card .sc-btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+/* ============================================
+   AOS Animation Override for Mobile
+   Ensures content is visible even if AOS fails
+   ============================================ */
+
+@media (max-width: 768px) {
+    .sc-cta [data-aos] {
+        opacity: 1 !important;
+        transform: none !important;
+        visibility: visible !important;
+    }
+    
+    .sc-cta__card[data-aos] {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}

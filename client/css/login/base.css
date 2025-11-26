@@ -1,0 +1,104 @@
+/* ============================================
+   SecureChat Login - Base Styles
+   ============================================ */
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: var(--sc-font-primary);
+    font-size: var(--sc-text-base);
+    font-weight: var(--sc-font-normal);
+    line-height: 1.6;
+    color: var(--sc-text-primary);
+    background: var(--sc-bg-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   Reset Form Elements - IMPORTANT
+   ============================================ */
+
+button,
+input,
+textarea,
+select {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    background: transparent;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* ============================================
+   Scrollbar
+   ============================================ */
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--sc-border-color-light);
+    border-radius: var(--sc-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--sc-text-muted);
+}
+
+/* ============================================
+   Selection & Focus
+   ============================================ */
+
+::selection {
+    background: rgba(0, 180, 216, 0.3);
+    color: var(--sc-text-primary);
+}
+
+:focus-visible {
+    outline: 2px solid var(--sc-color-primary);
+    outline-offset: 2px;
+}
+
+/* Remove focus outline for mouse users */
+:focus:not(:focus-visible) {
+    outline: none;
+}

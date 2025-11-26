@@ -1,0 +1,117 @@
+/* ============================================
+   SecureChat Login - Card Component
+   ============================================ */
+
+.sc-auth__card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--sc-bg-card);
+    border: 1px solid var(--sc-border-color);
+    border-radius: var(--sc-radius-2xl);
+    padding: var(--sc-space-10);
+    box-shadow: var(--sc-shadow-xl), var(--sc-shadow-glow);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle top gradient */
+.sc-auth__card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 150px;
+    background: linear-gradient(180deg, rgba(0, 180, 216, 0.03) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+/* === Header === */
+.sc-auth__header {
+    text-align: center;
+    margin-bottom: var(--sc-space-6);
+    position: relative;
+}
+
+.sc-auth__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sc-space-3);
+    margin-bottom: var(--sc-space-3);
+}
+
+.sc-auth__logo-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--sc-radius-xl);
+    background: linear-gradient(135deg, var(--sc-color-primary) 0%, var(--sc-color-primary-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: var(--sc-shadow-md), 0 0 20px rgba(0, 180, 216, 0.3);
+}
+
+.sc-auth__logo-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.sc-auth__title {
+    font-size: var(--sc-text-3xl);
+    font-weight: var(--sc-font-bold);
+    color: var(--sc-text-primary);
+    letter-spacing: -0.02em;
+}
+
+.sc-auth__subtitle {
+    font-size: var(--sc-text-sm);
+    color: var(--sc-text-secondary);
+    letter-spacing: 0.02em;
+}
+
+/* === Security Badge === */
+.sc-auth__security-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sc-space-2);
+    padding: var(--sc-space-2) var(--sc-space-4);
+    background: var(--sc-color-primary-subtle);
+    border: 1px solid rgba(0, 180, 216, 0.2);
+    border-radius: var(--sc-radius-full);
+    margin-bottom: var(--sc-space-6);
+}
+
+.sc-auth__security-icon {
+    width: 14px;
+    height: 14px;
+    color: var(--sc-color-primary);
+}
+
+.sc-auth__security-badge span {
+    font-size: var(--sc-text-xs);
+    color: var(--sc-color-primary);
+    font-weight: var(--sc-font-medium);
+}
+
+/* === Footer === */
+.sc-auth__footer {
+    margin-top: var(--sc-space-6);
+    padding-top: var(--sc-space-4);
+    border-top: 1px solid var(--sc-border-color);
+}
+
+.sc-auth__footer-security {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sc-space-2);
+    color: var(--sc-text-muted);
+    font-size: var(--sc-text-xs);
+}
+
+.sc-auth__footer-security svg {
+    color: var(--sc-color-accent);
+}

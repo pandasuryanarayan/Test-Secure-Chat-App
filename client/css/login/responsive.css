@@ -1,0 +1,182 @@
+/* ============================================
+   SecureChat Login - Responsive Styles
+   ============================================ */
+
+/* === Tablet (max-width: 768px) === */
+@media (max-width: 768px) {
+    .sc-auth {
+        padding: var(--sc-space-4);
+    }
+    
+    .sc-auth__card {
+        padding: var(--sc-space-8);
+        border-radius: var(--sc-radius-xl);
+    }
+    
+    .sc-auth__logo-icon {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .sc-auth__logo-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .sc-auth__title {
+        font-size: var(--sc-text-2xl);
+    }
+}
+
+/* === Mobile (max-width: 480px) === */
+@media (max-width: 480px) {
+    .sc-auth {
+        padding: var(--sc-space-3);
+        align-items: flex-start;
+        padding-top: var(--sc-space-8);
+    }
+    
+    .sc-auth__card {
+        padding: var(--sc-space-6);
+        max-width: 100%;
+        border-radius: var(--sc-radius-xl);
+    }
+    
+    .sc-auth__logo {
+        flex-direction: column;
+        gap: var(--sc-space-2);
+    }
+    
+    .sc-auth__logo-icon {
+        width: 56px;
+        height: 56px;
+    }
+    
+    .sc-auth__logo-icon svg {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .sc-auth__title {
+        font-size: var(--sc-text-xl);
+    }
+    
+    .sc-auth__subtitle {
+        font-size: var(--sc-text-xs);
+    }
+    
+    .sc-auth__security-badge {
+        padding: var(--sc-space-2) var(--sc-space-3);
+    }
+    
+    .sc-auth__security-badge span {
+        font-size: 10px;
+    }
+    
+    .sc-auth__tab {
+        padding: var(--sc-space-3);
+        font-size: var(--sc-text-xs);
+    }
+    
+    .sc-auth__tab-icon {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .sc-form-input {
+        padding: var(--sc-space-3);
+        padding-left: calc(var(--sc-space-3) * 2 + 16px);
+        font-size: var(--sc-text-base);
+    }
+    
+    .sc-form-input-icon {
+        left: var(--sc-space-3);
+        width: 16px;
+        height: 16px;
+    }
+    
+    .sc-btn--lg {
+        padding: var(--sc-space-3) var(--sc-space-4);
+    }
+    
+    .sc-auth__footer-security {
+        flex-direction: column;
+        gap: var(--sc-space-1);
+    }
+}
+
+/* === Very Small (max-width: 360px) === */
+@media (max-width: 360px) {
+    .sc-auth__card {
+        padding: var(--sc-space-5);
+    }
+    
+    .sc-auth__tabs {
+        flex-direction: column;
+        gap: var(--sc-space-1);
+    }
+    
+    .sc-auth__tab-indicator {
+        display: none;
+    }
+    
+    .sc-auth__tab--active {
+        background: linear-gradient(135deg, var(--sc-color-primary) 0%, var(--sc-color-primary-dark) 100%);
+        color: white;
+    }
+}
+
+/* === Landscape Mode === */
+@media (max-height: 600px) and (orientation: landscape) {
+    .sc-auth {
+        padding: var(--sc-space-4);
+        align-items: flex-start;
+    }
+    
+    .sc-auth__card {
+        padding: var(--sc-space-6);
+    }
+    
+    .sc-auth__header {
+        margin-bottom: var(--sc-space-4);
+    }
+    
+    .sc-auth__security-badge {
+        margin-bottom: var(--sc-space-4);
+    }
+    
+    .sc-auth__tabs {
+        margin-bottom: var(--sc-space-4);
+    }
+    
+    .sc-auth__form {
+        gap: var(--sc-space-3);
+    }
+}
+
+/* === Reduced Motion === */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .sc-auth-bg__gradient {
+        animation: none;
+    }
+}
+
+/* === Print === */
+@media print {
+    .sc-auth-bg {
+        display: none;
+    }
+    
+    .sc-auth__card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}

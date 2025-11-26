@@ -1,0 +1,82 @@
+/* ============================================
+   SecureChat Login - Animations
+   ============================================ */
+
+/* === Background Float === */
+@keyframes sc-bg-float {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    25% {
+        transform: translate(-10px, -15px) scale(1.02);
+    }
+    50% {
+        transform: translate(10px, -5px) scale(0.98);
+    }
+    75% {
+        transform: translate(-5px, 10px) scale(1.01);
+    }
+}
+
+/* === Spin (Loading) === */
+@keyframes sc-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* === Message Slide In === */
+@keyframes sc-message-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === Fade In === */
+@keyframes sc-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === Shake (Error) === */
+@keyframes sc-shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+/* === Pulse Glow === */
+@keyframes sc-pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(0, 180, 216, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(0, 180, 216, 0.4);
+    }
+}
+
+/* === Utility Classes === */
+.sc-animate-fade-in {
+    animation: sc-fade-in 0.5s ease;
+}
+
+.sc-animate-shake {
+    animation: sc-shake 0.5s ease;
+}

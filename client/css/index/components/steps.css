@@ -1,0 +1,108 @@
+.sc-steps {
+    padding: var(--sc-section-padding) 0;
+    background: var(--sc-bg-primary);
+}
+
+.sc-steps__timeline {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.sc-step {
+    display: grid;
+    grid-template-columns: 80px 1fr 280px;
+    gap: 40px;
+    align-items: center;
+    margin-bottom: 80px;
+}
+
+.sc-step--reverse { direction: rtl; }
+.sc-step--reverse .sc-step__content { direction: ltr; }
+
+.sc-step__number {
+    font-size: 4rem;
+    font-weight: 900;
+    background: var(--sc-gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0.3;
+    line-height: 1;
+}
+
+.sc-step__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.sc-step__text {
+    font-size: 1.05rem;
+    color: var(--sc-text-secondary);
+    line-height: 1.7;
+}
+
+.sc-step__visual { display: flex; justify-content: center; }
+
+.sc-mockup {
+    width: 240px;
+    background: var(--sc-bg-card);
+    border: 1px solid var(--sc-border);
+    border-radius: var(--sc-radius-xl);
+    padding: 24px;
+    box-shadow: var(--sc-shadow-xl);
+}
+
+.sc-mockup__input {
+    height: 40px;
+    background: var(--sc-bg-tertiary);
+    border-radius: var(--sc-radius-md);
+    margin-bottom: 12px;
+}
+
+.sc-mockup__btn {
+    height: 44px;
+    background: var(--sc-gradient-primary);
+    border-radius: var(--sc-radius-full);
+    margin-top: 8px;
+}
+
+.sc-mockup__id {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--sc-primary);
+    text-align: center;
+    letter-spacing: 6px;
+    padding: 40px 0;
+}
+
+.sc-mockup__copy {
+    height: 40px;
+    background: var(--sc-bg-tertiary);
+    border-radius: var(--sc-radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    color: var(--sc-text-secondary);
+}
+
+.sc-mockup--chat { padding: 20px; }
+
+.sc-mockup__msg {
+    height: 40px;
+    border-radius: var(--sc-radius-lg);
+    margin-bottom: 10px;
+    width: 70%;
+}
+
+.sc-mockup__msg--sent {
+    background: var(--sc-gradient-primary);
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+}
+
+.sc-mockup__msg--received {
+    background: var(--sc-bg-tertiary);
+    border-bottom-left-radius: 4px;
+}

@@ -1,0 +1,23 @@
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+    font-family: var(--sc-font);
+    background: var(--sc-bg-primary);
+    color: var(--sc-text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a { text-decoration: none; color: inherit; transition: var(--sc-transition-base); }
+img { max-width: 100%; height: auto; display: block; }
+
+::selection { background: rgba(0, 180, 216, 0.3); color: var(--sc-text-primary); }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--sc-bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--sc-border-light); border-radius: var(--sc-radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--sc-text-muted); }

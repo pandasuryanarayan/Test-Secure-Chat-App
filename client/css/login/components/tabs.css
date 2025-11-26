@@ -1,0 +1,87 @@
+/* ============================================
+   SecureChat Login - Tabs Component
+   ============================================ */
+
+.sc-auth__tabs {
+    display: flex;
+    background: var(--sc-bg-primary);
+    border: 1px solid var(--sc-border-color);
+    border-radius: var(--sc-radius-lg);
+    padding: 4px;
+    margin-bottom: var(--sc-space-6);
+    position: relative;
+}
+
+.sc-auth__tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sc-space-2);
+    padding: var(--sc-space-3) var(--sc-space-4);
+    background: transparent;
+    color: var(--sc-text-muted);
+    font-size: var(--sc-text-sm);
+    font-weight: var(--sc-font-medium);
+    border: none;
+    border-radius: var(--sc-radius-md);
+    cursor: pointer;
+    transition: all var(--sc-transition-fast);
+    position: relative;
+    z-index: 2;
+}
+
+.sc-auth__tab:hover {
+    color: var(--sc-text-primary);
+}
+
+/* Active tab - text on top of gradient background */
+.sc-auth__tab--active {
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.sc-auth__tab-icon {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   Sliding Indicator Background
+   ============================================ */
+
+.sc-auth__tab-indicator {
+    position: absolute;
+    width: calc(50% - 4px);
+    height: calc(100% - 8px);
+    background: linear-gradient(135deg, var(--sc-color-primary) 0%, var(--sc-color-primary-dark) 100%);
+    border-radius: var(--sc-radius-md);
+    top: 4px;
+    left: 4px;
+    transition: transform var(--sc-transition-normal) cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+    box-shadow: 0 2px 8px rgba(0, 180, 216, 0.3);
+}
+
+/* Move indicator when register tab is active */
+.sc-auth__tabs:has(.sc-auth__tab[data-tab="register"].sc-auth__tab--active) .sc-auth__tab-indicator {
+    transform: translateX(calc(100% + 0px));
+}
+
+/* ============================================
+   Fallback for browsers without :has() support
+   ============================================ */
+
+@supports not selector(:has(*)) {
+    .sc-auth__tab-indicator {
+        display: none;
+    }
+    
+    .sc-auth__tab--active {
+        background: linear-gradient(135deg, var(--sc-color-primary) 0%, var(--sc-color-primary-dark) 100%);
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 180, 216, 0.3);
+    }
+}
