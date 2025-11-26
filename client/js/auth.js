@@ -184,7 +184,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
       document.getElementById("loginForm").reset();
 
       setTimeout(() => {
-        window.location.href = window.location.origin + "./chat.html";
+        window.location.href = "../chat.html";
       }, 1500);
     } else {
       showMessage(data.message || "Login failed", "error");
