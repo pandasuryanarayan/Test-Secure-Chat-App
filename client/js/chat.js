@@ -108,7 +108,7 @@ async function initEncryption() {
 
 // Check authentication
 if (!localStorage.getItem('token')) {
-    window.location.href = '/client/login.html';
+    window.location.href = './login.html';
 }
 
 // Display user info (using new IDs)
