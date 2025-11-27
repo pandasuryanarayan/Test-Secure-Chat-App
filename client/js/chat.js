@@ -1,5 +1,5 @@
 // Define the server URL
-const SERVER_URL = 'https://test-secure-chat-app.onrender.com'; // Your Express server URL
+const SERVER_URL = 'http://localhost:3000'; // Your Express server URL
 // const SERVER_URL = 'https://secure-chat-app-8typ.onrender.com';
 const API_URL = `${SERVER_URL}/api`;
 const IS_PRODUCTION = SERVER_URL.includes('onrender.com') || !SERVER_URL.includes('localhost');
@@ -53,6 +53,9 @@ let typingTimeout;
 let onlineUsers = new Set();
 let messageBuffer = new Map();
 let processedMessages = new Set();
+
+// Track key exchange status for each user
+let keyExchangeStatus = new Map(); // userId -> boolean (true if completed)
 
 // Image handling utilities
 const imageChunks = new Map();
@@ -151,9 +154,19 @@ function showOfflineToast(message, type = 'info') {
     }, 3000);
 }
 
-// Check if user is online
+// Check if user is online and key exchange is complete
 function isUserOnline(userId) {
     return onlineUsers.has(userId);
+}
+
+// Check if key exchange is complete for a user
+function isKeyExchangeComplete(userId) {
+    return keyExchangeStatus.get(userId) === true;
+}
+
+// Check if user is ready to chat (online + key exchange complete)
+function isUserReadyToChat(userId) {
+    return isUserOnline(userId) && isKeyExchangeComplete(userId);
 }
 
 // Update empty state in contacts list
@@ -236,6 +249,7 @@ function updateMessageControls() {
     }
     
     const isOnline = isUserOnline(currentChatUser);
+    const keyExchangeComplete = isKeyExchangeComplete(currentChatUser);
     const user = contacts.get(currentChatUser);
     
     if (!isOnline) {
@@ -244,6 +258,12 @@ function updateMessageControls() {
         if (emojiBtn) emojiBtn.disabled = true;
         if (attachImageBtn) attachImageBtn.disabled = true;
         messageInput.placeholder = `${user?.username || 'User'} is offline`;
+    } else if (!keyExchangeComplete) {
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+        if (emojiBtn) emojiBtn.disabled = true;
+        if (attachImageBtn) attachImageBtn.disabled = true;
+        messageInput.placeholder = 'Securing connection...';
     } else {
         messageInput.disabled = false;
         sendBtn.disabled = false;
@@ -359,6 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
 
+                    // Initiate key exchange
                     await initiateKeyExchange(user.userId);
                     
                     if (contactSearchInput) contactSearchInput.value = '';
@@ -402,6 +423,9 @@ socket.on('contact-added', async (data) => {
                 updateContactsEmptyState();
                 displayContact(user);
                 showNotification(user.username, `${user.username} added you as a contact`);
+                
+                // Initiate key exchange with new contact
+                await initiateKeyExchange(user.userId);
             }
         } catch (error) {
             console.error('Error fetching contact:', error);
@@ -441,9 +465,6 @@ function displayContact(user) {
             <div class="sc-contact__name">${user.username}</div>
             <div class="sc-contact__preview">ID: ${user.userId}</div>
         </div>
-        <div class="sc-contact__meta">
-            <span class="sc-contact__time">${isOnline ? 'Online' : 'Offline'}</span>
-        </div>
     `;
 
     contactDiv.onclick = () => selectContact(user);
@@ -465,6 +486,7 @@ function selectContact(user) {
     }
 
     const isOnline = onlineUsers.has(user.userId);
+    const keyExchangeComplete = isKeyExchangeComplete(user.userId);
     
     // Update chat header (using new IDs)
     const chatPartnerName = DOM.chatPartnerName();
@@ -475,8 +497,16 @@ function selectContact(user) {
     }
     
     if (chatPartnerStatus) {
-        chatPartnerStatus.textContent = isOnline ? 'Online' : 'Offline';
-        chatPartnerStatus.className = `sc-chat__user-status ${isOnline ? 'sc-chat__user-status--online' : ''}`;
+        if (!isOnline) {
+            chatPartnerStatus.textContent = 'Offline';
+            chatPartnerStatus.className = 'sc-chat__user-status';
+        } else if (!keyExchangeComplete) {
+            chatPartnerStatus.textContent = 'Securing connection...';
+            chatPartnerStatus.className = 'sc-chat__user-status';
+        } else {
+            chatPartnerStatus.textContent = 'Online';
+            chatPartnerStatus.className = 'sc-chat__user-status sc-chat__user-status--online';
+        }
     }
 
     updateMessageControls();
@@ -547,16 +577,31 @@ socket.on('pending-messages', async (data) => {
     }
 });
 
-// Handle user online status
-socket.on('user-online', (data) => {
+// ============================================
+// MODIFIED: Handle user online status with key exchange
+// ============================================
+socket.on('user-online', async (data) => {
     const { userId, username } = data;
+    
+    console.log(`User ${username} (${userId}) came online`);
+    
+    // Add to online users
     onlineUsers.add(userId);
+    
+    // Reset key exchange status - needs to be re-established
+    keyExchangeStatus.set(userId, false);
     
     if (contacts.has(userId)) {
         const user = contacts.get(userId);
         user.isOnline = true;
+        
+        // Update contact display
         displayContact(user);
         
+        // Show notification
+        showOfflineToast(`${username} is online`, 'info');
+        
+        // If this is the current chat user, update UI but keep disabled
         if (currentChatUser === userId) {
             const chatPartnerName = DOM.chatPartnerName();
             const chatPartnerStatus = DOM.chatPartnerStatus();
@@ -565,18 +610,31 @@ socket.on('user-online', (data) => {
                 chatPartnerName.textContent = username;
             }
             if (chatPartnerStatus) {
-                chatPartnerStatus.textContent = 'Online';
-                chatPartnerStatus.className = 'sc-chat__user-status sc-chat__user-status--online';
+                chatPartnerStatus.textContent = 'Securing connection...';
+                chatPartnerStatus.className = 'sc-chat__user-status';
             }
+            
+            // Disable controls while securing connection
             updateMessageControls();
         }
+        
+        // Re-initiate key exchange with the user who came online
+        console.log(`Initiating key exchange with ${username}`);
+        await initiateKeyExchange(userId);
     }
 });
 
 // Handle user offline status
 socket.on('user-offline', (data) => {
     const { userId } = data;
+    
+    console.log(`User ${userId} went offline`);
+    
+    // Remove from online users
     onlineUsers.delete(userId);
+    
+    // Clear key exchange status
+    keyExchangeStatus.set(userId, false);
     
     if (contacts.has(userId)) {
         const user = contacts.get(userId);
@@ -594,37 +652,133 @@ socket.on('user-offline', (data) => {
     }
 });
 
-// Key exchange for E2E encryption
+// ============================================
+// MODIFIED: Key exchange with completion tracking
+// ============================================
 async function initiateKeyExchange(targetUserId) {
-    const publicKey = await encryption.exportPublicKey();
-    const aesKey = await encryption.generateAESKey();
+    console.log(`Starting key exchange with user ${targetUserId}`);
     
-    socket.emit('key-exchange', {
-        targetUserId,
-        publicKey,
-        type: 'public-key'
-    });
-    
-    encryption.tempAESKey = aesKey;
+    try {
+        // Mark as in progress
+        keyExchangeStatus.set(targetUserId, false);
+        
+        const publicKey = await encryption.exportPublicKey();
+        const aesKey = await encryption.generateAESKey();
+        
+        socket.emit('key-exchange', {
+            targetUserId,
+            publicKey,
+            type: 'public-key'
+        });
+        
+        encryption.tempAESKey = aesKey;
+        
+        console.log(`Key exchange initiated with user ${targetUserId}`);
+    } catch (error) {
+        console.error('Error initiating key exchange:', error);
+        keyExchangeStatus.set(targetUserId, false);
+    }
 }
 
 // Handle key exchange
 socket.on('key-exchange', async (data) => {
-    if (data.type === 'public-key') {
-        const publicKey = await encryption.importPublicKey(data.publicKey);
-        const aesKey = await encryption.generateAESKey();
-        encryption.setSharedSecret(data.fromUserId, aesKey);
+    try {
+        if (data.type === 'public-key') {
+            console.log(`Received public key from user ${data.fromUserId}`);
+            
+            const publicKey = await encryption.importPublicKey(data.publicKey);
+            const aesKey = await encryption.generateAESKey();
+            encryption.setSharedSecret(data.fromUserId, aesKey);
+            
+            const encryptedAESKey = await encryption.encryptAESKey(aesKey, publicKey);
+            
+            socket.emit('key-exchange', {
+                targetUserId: data.fromUserId,
+                publicKey: encryptedAESKey,
+                type: 'aes-key'
+            });
+            
+            console.log(`Sent AES key to user ${data.fromUserId}`);
+            
+            // Mark key exchange as complete (receiver side)
+            keyExchangeStatus.set(data.fromUserId, true);
+            
+            // Notify completion
+            socket.emit('key-exchange', {
+                targetUserId: data.fromUserId,
+                type: 'exchange-complete'
+            });
+            
+            console.log(`Key exchange completed with user ${data.fromUserId}`);
+            
+            // Update UI if this is current chat
+            if (currentChatUser === data.fromUserId) {
+                const chatPartnerStatus = DOM.chatPartnerStatus();
+                if (chatPartnerStatus && isUserOnline(data.fromUserId)) {
+                    chatPartnerStatus.textContent = 'Online';
+                    chatPartnerStatus.className = 'sc-chat__user-status sc-chat__user-status--online';
+                }
+                updateMessageControls();
+            }
+            
+            // Update contact display
+            const user = contacts.get(data.fromUserId);
+            if (user) {
+                displayContact(user);
+            }
+            
+        } else if (data.type === 'aes-key') {
+            console.log(`Received AES key from user ${data.fromUserId}`);
+            
+            const aesKey = await encryption.decryptAESKey(data.publicKey);
+            encryption.setSharedSecret(data.fromUserId, aesKey);
+            
+            console.log(`AES key set for user ${data.fromUserId}`);
+            
+            // Mark key exchange as complete (initiator side)
+            keyExchangeStatus.set(data.fromUserId, true);
+            
+            console.log(`Key exchange completed with user ${data.fromUserId}`);
+            
+            // Update UI if this is current chat
+            if (currentChatUser === data.fromUserId) {
+                const chatPartnerStatus = DOM.chatPartnerStatus();
+                if (chatPartnerStatus && isUserOnline(data.fromUserId)) {
+                    chatPartnerStatus.textContent = 'Online';
+                    chatPartnerStatus.className = 'sc-chat__user-status sc-chat__user-status--online';
+                }
+                updateMessageControls();
+            }
+            
+            // Update contact display
+            const user = contacts.get(data.fromUserId);
+            if (user) {
+                displayContact(user);
+            }
+            
+        } else if (data.type === 'exchange-complete') {
+            console.log(`Key exchange completion confirmed by user ${data.fromUserId}`);
+            
+            // Ensure it's marked as complete
+            keyExchangeStatus.set(data.fromUserId, true);
+            
+            // Update UI if this is current chat
+            if (currentChatUser === data.fromUserId) {
+                const chatPartnerStatus = DOM.chatPartnerStatus();
+                if (chatPartnerStatus && isUserOnline(data.fromUserId)) {
+                    chatPartnerStatus.textContent = 'Online';
+                    chatPartnerStatus.className = 'sc-chat__user-status sc-chat__user-status--online';
+                }
+                updateMessageControls();
+            }
+        }
+    } catch (error) {
+        console.error('Error in key exchange:', error);
+        keyExchangeStatus.set(data.fromUserId, false);
         
-        const encryptedAESKey = await encryption.encryptAESKey(aesKey, publicKey);
-        
-        socket.emit('key-exchange', {
-            targetUserId: data.fromUserId,
-            publicKey: encryptedAESKey,
-            type: 'aes-key'
-        });
-    } else if (data.type === 'aes-key') {
-        const aesKey = await encryption.decryptAESKey(data.publicKey);
-        encryption.setSharedSecret(data.fromUserId, aesKey);
+        if (currentChatUser === data.fromUserId) {
+            updateMessageControls();
+        }
     }
 });
 
@@ -650,9 +804,16 @@ async function sendMessage() {
     
     if (!message || !currentChatUser) return;
     
+    // Check if user is online
     if (!isUserOnline(currentChatUser)) {
         const user = contacts.get(currentChatUser);
         showOfflineToast(`${user?.username || 'User'} is offline`, 'error');
+        return;
+    }
+    
+    // Check if key exchange is complete
+    if (!isKeyExchangeComplete(currentChatUser)) {
+        showOfflineToast('Securing connection, please wait...', 'error');
         return;
     }
     
@@ -780,7 +941,7 @@ function escapeHtml(text) {
 
 // Typing indicator
 function handleTyping() {
-    if (!currentChatUser || !isUserOnline(currentChatUser)) return;
+    if (!currentChatUser || !isUserReadyToChat(currentChatUser)) return;
     
     socket.emit('typing', {
         targetUserId: currentChatUser,
@@ -881,6 +1042,12 @@ async function compressImage(file, maxWidth = 1920, maxHeight = 1080, targetSize
 
 // Upload image via HTTP
 async function uploadImageViaHTTP(file, targetUserId) {
+    // Check if user is ready to chat
+    if (!isUserReadyToChat(targetUserId)) {
+        showOfflineToast('Cannot send image. User is offline or connection not secured.', 'error');
+        return;
+    }
+    
     try {
         showOfflineToast('Processing image...');
         
@@ -1128,6 +1295,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 showOfflineToast('Please select a contact first', 'error');
                 return;
             }
+            
+            if (!isUserReadyToChat(currentChatUser)) {
+                showOfflineToast('User is offline or connection not secured', 'error');
+                return;
+            }
+            
             imageInput?.click();
         });
     }
@@ -1147,8 +1320,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
-            if (!currentChatUser || !isUserOnline(currentChatUser)) {
-                showOfflineToast('User is offline', 'error');
+            if (!currentChatUser || !isUserReadyToChat(currentChatUser)) {
+                showOfflineToast('User is offline or connection not secured', 'error');
                 return;
             }
             
