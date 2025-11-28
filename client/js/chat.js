@@ -1361,7 +1361,7 @@ function showNotification(title, message) {
     if (Notification.permission === 'granted') {
         new Notification(title, {
             body: message,
-            icon: '/client/notification.png'
+            icon: './notification.png'
         });
     }
 }
