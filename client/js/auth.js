@@ -281,7 +281,7 @@ document
               `Your unique ID is: ${data.userId}\n\nPlease save this ID. You'll need it to share with others.\n\nClick OK to continue to chat.`
             )
           ) {
-            window.location.href = "/client/chat.html";
+            window.location.href = "../chat.html";
           }
         }, 1000);
       } else {
