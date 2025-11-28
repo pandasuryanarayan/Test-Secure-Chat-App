@@ -302,7 +302,7 @@ document
 if (localStorage.getItem("token") && sessionStorage.getItem("sessionActive")) {
   showMessage("Already logged in. Redirecting...", "success");
   setTimeout(() => {
-    window.location.href = "/client/chat.html";
+    window.location.href = "./chat.html";
   }, 1000);
 }
 
